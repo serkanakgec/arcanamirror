@@ -1,49 +1,76 @@
 import { TarotCard } from '../data/tarotDeck';
+import { SelectedCard, ReadingType } from '../types/reading';
 
 export interface ReadingResponse {
   reading: string;
   error?: string;
 }
 
-export async function generateReading(
-  question: string,
-  cards: TarotCard[]
+export async function generateDetailedReading(
+  readingType: ReadingType,
+  selectedCards: SelectedCard[],
+  deck: TarotCard[]
 ): Promise<ReadingResponse> {
   const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
 
   if (!apiKey) {
     return {
       reading: '',
-      error: 'Gemini API key not configured. Please add your API key to the .env file.'
+      error: 'Gemini API anahtarı yapılandırılmamış. Lütfen .env dosyasına API anahtarınızı ekleyin.'
     };
   }
 
   try {
-    const prompt = `You are a wise and empathetic tarot reader. A seeker has drawn three cards for a Past-Present-Future spread and asked: "${question}"
+    const cardsInfo = selectedCards.map(sc => {
+      const card = deck.find(c => c.id === sc.cardId);
+      if (!card) return null;
 
-The cards drawn are:
+      return `${sc.position}. ${card.nameTr} (${card.name}) - ${sc.orientation === 'upright' ? 'Düz' : 'Ters'}
+   Anahtar Kelimeler: ${sc.orientation === 'upright' ? card.keywordsTr.join(', ') : 'ters anlam'}
+   Sembolizm: ${card.symbolismTr}
+   Anlam: ${sc.orientation === 'upright' ? card.uprightTr : card.reversedTr}`;
+    }).filter(Boolean).join('\n\n');
 
-1. PAST - ${cards[0].name} (${cards[0].suit})
-   Upright meaning: ${cards[0].upright}
-   Symbolism: ${cards[0].symbolism}
+    const prompt = `Kullanıcı "${readingType}" fal türü için şu kartları seçti (sıralı):
 
-2. PRESENT - ${cards[1].name} (${cards[1].suit})
-   Upright meaning: ${cards[1].upright}
-   Symbolism: ${cards[1].symbolism}
+${cardsInfo}
 
-3. FUTURE - ${cards[2].name} (${cards[2].suit})
-   Upright meaning: ${cards[2].upright}
-   Symbolism: ${cards[2].symbolism}
+Lütfen aşağıdaki formatta, Türkçe, nazik ve yol gösterici bir dille detaylı bir tarot okuması üret:
 
-Please provide a detailed, compassionate, and insightful reading that:
-- Connects the three cards to tell a cohesive story
-- Addresses their specific question
-- Offers guidance and empowerment
-- Uses mystical but accessible language
-- Is approximately 200-300 words
-- Feels personal and meaningful
+1. KISA ÖZET (2-4 cümle)
+   Seçilen kartların genel mesajını özetle.
 
-Begin with a brief acknowledgment of their question, then weave the cards together into a narrative that flows from past through present to future.`;
+2. KART BAZLI AÇIKLAMALAR
+   Her kart için:
+   - Kart adı ve yönelimi
+   - Anahtar kelimeler (3-5 kelime)
+   - Sembolizm ve kısa anlam (2-4 cümle)
+   - Pozisyondaki özel anlamı
+
+3. KARTLAR ARASINDAKİ HİKÂYE
+   Seçilen kartların birbirleriyle ilişkisini anlatan 4-6 cümle. Kartların nasıl bir araya geldiğini ve ne tür bir yolculuk anlattığını açıkla.
+
+4. PSİKOLOJİK BAKIŞ
+   Bu okumanın kullanıcıya içsel olarak ne söyleyebileceği (4-6 cümle). Olası içsel engeller, fırsatlar ve büyüme alanları.
+
+5. SOMUT ÖNERİLER
+   3 pratik, uygulanabilir adım:
+   - Öneri 1: [Kısa açıklama]
+   - Öneri 2: [Kısa açıklama]
+   - Öneri 3: [Kısa açıklama]
+
+6. YANSITMA SORULARI
+   Kullanıcının düşünmesini sağlayacak 3 açık uçlu soru:
+   - Soru 1?
+   - Soru 2?
+   - Soru 3?
+
+7. KAPANIŞ
+   Nazik bir özet ve destekleyici cümle (2-3 cümle). Kullanıcıya umut ve güç veren bir mesaj.
+
+Dil: Türkçe, samimi, anlaşılır, mistik ama erişilebilir
+Uzunluk: Toplam 400-600 kelime
+Ton: Empatik, bilge, yol gösterici, destekleyici`;
 
     const response = await fetch(
       `https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=${apiKey}`,
@@ -63,10 +90,10 @@ Begin with a brief acknowledgment of their question, then weave the cards togeth
             },
           ],
           generationConfig: {
-            temperature: 0.9,
+            temperature: 0.8,
             topK: 40,
             topP: 0.95,
-            maxOutputTokens: 1024,
+            maxOutputTokens: 2048,
           },
         }),
       }
@@ -74,22 +101,22 @@ Begin with a brief acknowledgment of their question, then weave the cards togeth
 
     if (!response.ok) {
       const errorData = await response.json();
-      throw new Error(errorData.error?.message || 'Failed to generate reading');
+      throw new Error(errorData.error?.message || 'Yorum oluşturulamadı');
     }
 
     const data = await response.json();
     const reading = data.candidates?.[0]?.content?.parts?.[0]?.text;
 
     if (!reading) {
-      throw new Error('No reading generated');
+      throw new Error('Yorum oluşturulamadı');
     }
 
     return { reading };
   } catch (error) {
-    console.error('Gemini API error:', error);
+    console.error('Gemini API hatası:', error);
     return {
       reading: '',
-      error: error instanceof Error ? error.message : 'Failed to generate reading. Please try again.',
+      error: error instanceof Error ? error.message : 'Yorum oluşturulamadı. Lütfen tekrar deneyin.',
     };
   }
 }
