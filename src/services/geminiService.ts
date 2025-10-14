@@ -9,14 +9,15 @@ export interface ReadingResponse {
 export async function generateDetailedReading(
   readingType: ReadingType,
   selectedCards: SelectedCard[],
-  deck: TarotCard[]
+  deck: TarotCard[],
+  question: string
 ): Promise<ReadingResponse> {
   const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
 
   if (!apiKey) {
     return {
       reading: '',
-      error: 'Gemini API anahtarı yapılandırılmamış. Lütfen .env dosyasına API anahtarınızı ekleyin.'
+      error: 'Gemini API key is not configured. Please add your API key to the .env file as VITE_GEMINI_API_KEY'
     };
   }
 
@@ -25,52 +26,54 @@ export async function generateDetailedReading(
       const card = deck.find(c => c.id === sc.cardId);
       if (!card) return null;
 
-      return `${sc.position}. ${card.nameTr} (${card.name}) - ${sc.orientation === 'upright' ? 'Düz' : 'Ters'}
-   Anahtar Kelimeler: ${sc.orientation === 'upright' ? card.keywordsTr.join(', ') : 'ters anlam'}
-   Sembolizm: ${card.symbolismTr}
-   Anlam: ${sc.orientation === 'upright' ? card.uprightTr : card.reversedTr}`;
+      return `${sc.position}. ${card.name} - ${sc.orientation === 'upright' ? 'Upright' : 'Reversed'}
+   Keywords: ${sc.orientation === 'upright' ? card.keywords.join(', ') : 'reversed meaning'}
+   Symbolism: ${card.symbolism}
+   Meaning: ${sc.orientation === 'upright' ? card.upright : card.reversed}`;
     }).filter(Boolean).join('\n\n');
 
-    const prompt = `Kullanıcı "${readingType}" fal türü için şu kartları seçti (sıralı):
+    const prompt = `The user has asked the following question: "${question}"
+
+For this "${readingType}" reading, they selected these cards (in order):
 
 ${cardsInfo}
 
-Lütfen aşağıdaki formatta, Türkçe, nazik ve yol gösterici bir dille detaylı bir tarot okuması üret:
+Please provide a detailed, compassionate tarot reading in English with the following format:
 
-1. KISA ÖZET (2-4 cümle)
-   Seçilen kartların genel mesajını özetle.
+1. BRIEF SUMMARY (2-4 sentences)
+   Directly address their question and summarize the general message of the selected cards.
 
-2. KART BAZLI AÇIKLAMALAR
-   Her kart için:
-   - Kart adı ve yönelimi
-   - Anahtar kelimeler (3-5 kelime)
-   - Sembolizm ve kısa anlam (2-4 cümle)
-   - Pozisyondaki özel anlamı
+2. CARD-BY-CARD ANALYSIS
+   For each card:
+   - Card name and orientation
+   - Key themes (3-5 keywords)
+   - Symbolism and meaning (2-4 sentences)
+   - Specific relevance to their question
 
-3. KARTLAR ARASINDAKİ HİKÂYE
-   Seçilen kartların birbirleriyle ilişkisini anlatan 4-6 cümle. Kartların nasıl bir araya geldiğini ve ne tür bir yolculuk anlattığını açıkla.
+3. THE CARDS' STORY
+   Explain how the cards connect to tell a cohesive story (4-6 sentences). Show how they relate to each other and the journey they reveal regarding the user's question.
 
-4. PSİKOLOJİK BAKIŞ
-   Bu okumanın kullanıcıya içsel olarak ne söyleyebileceği (4-6 cümle). Olası içsel engeller, fırsatlar ve büyüme alanları.
+4. PSYCHOLOGICAL INSIGHT
+   What this reading reveals about their inner world (4-6 sentences). Discuss possible internal blocks, opportunities, and growth areas directly relevant to their question.
 
-5. SOMUT ÖNERİLER
-   3 pratik, uygulanabilir adım:
-   - Öneri 1: [Kısa açıklama]
-   - Öneri 2: [Kısa açıklama]
-   - Öneri 3: [Kısa açıklama]
+5. PRACTICAL RECOMMENDATIONS
+   3 actionable steps they can take:
+   - Action 1: [Brief description]
+   - Action 2: [Brief description]
+   - Action 3: [Brief description]
 
-6. YANSITMA SORULARI
-   Kullanıcının düşünmesini sağlayacak 3 açık uçlu soru:
-   - Soru 1?
-   - Soru 2?
-   - Soru 3?
+6. REFLECTION QUESTIONS
+   3 open-ended questions for contemplation:
+   - Question 1?
+   - Question 2?
+   - Question 3?
 
-7. KAPANIŞ
-   Nazik bir özet ve destekleyici cümle (2-3 cümle). Kullanıcıya umut ve güç veren bir mesaj.
+7. CLOSING
+   A supportive summary and empowering message (2-3 sentences) that brings hope and strength.
 
-Dil: Türkçe, samimi, anlaşılır, mistik ama erişilebilir
-Uzunluk: Toplam 400-600 kelime
-Ton: Empatik, bilge, yol gösterici, destekleyici`;
+Language: English, warm, accessible, mystical yet grounded
+Length: 400-600 words total
+Tone: Empathetic, wise, guiding, supportive, and directly addressing their specific question`;
 
     const response = await fetch(
       `https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=${apiKey}`,
@@ -101,22 +104,22 @@ Ton: Empatik, bilge, yol gösterici, destekleyici`;
 
     if (!response.ok) {
       const errorData = await response.json();
-      throw new Error(errorData.error?.message || 'Yorum oluşturulamadı');
+      throw new Error(errorData.error?.message || 'Failed to generate reading');
     }
 
     const data = await response.json();
     const reading = data.candidates?.[0]?.content?.parts?.[0]?.text;
 
     if (!reading) {
-      throw new Error('Yorum oluşturulamadı');
+      throw new Error('No reading generated');
     }
 
     return { reading };
   } catch (error) {
-    console.error('Gemini API hatası:', error);
+    console.error('Gemini API error:', error);
     return {
       reading: '',
-      error: error instanceof Error ? error.message : 'Yorum oluşturulamadı. Lütfen tekrar deneyin.',
+      error: error instanceof Error ? error.message : 'Failed to generate reading. Please try again.',
     };
   }
 }

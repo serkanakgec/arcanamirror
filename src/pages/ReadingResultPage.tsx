@@ -42,7 +42,7 @@ export function ReadingResultPage({
             className="flex items-center gap-2 text-amber-400 hover:text-amber-300 transition-colors"
           >
             <ArrowLeft size={20} />
-            <span>Kart Seçimi</span>
+            <span>Card Selection</span>
           </button>
 
           <button
@@ -50,21 +50,21 @@ export function ReadingResultPage({
             className="flex items-center gap-2 text-amber-400 hover:text-amber-300 transition-colors"
           >
             <RefreshCw size={20} />
-            <span>Yeni Fal</span>
+            <span>New Reading</span>
           </button>
         </div>
 
         <header className="text-center mb-12 animate-fade-in">
           <h1 className="text-4xl md:text-5xl font-decorative text-amber-400 glow-text mb-2">
-            {config.nameTr}
+            {config.name}
           </h1>
-          <p className="text-slate-300">Yorumunuz hazır</p>
+          <p className="text-slate-300">Your reading is ready</p>
         </header>
 
         <div className="max-w-6xl mx-auto space-y-12">
           <div>
             <h2 className="text-2xl font-decorative text-amber-400 text-center mb-6">
-              Seçilen Kartlar
+              Selected Cards
             </h2>
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6 justify-items-center">
               {selectedCards.map((sc) => {
@@ -90,10 +90,10 @@ export function ReadingResultPage({
                       </div>
                     </div>
                     <p className="text-slate-300 text-sm mt-2 text-center">
-                      {card.nameTr}
+                      {card.name}
                     </p>
                     {sc.orientation === 'reversed' && (
-                      <p className="text-slate-400 text-xs text-center">(Ters)</p>
+                      <p className="text-slate-400 text-xs text-center">(Reversed)</p>
                     )}
                   </button>
                 );
@@ -104,7 +104,7 @@ export function ReadingResultPage({
           {reading ? (
             <div className="bg-gradient-to-br from-slate-900/80 via-purple-900/20 to-slate-900/80 backdrop-blur-sm border-2 border-amber-500/30 rounded-lg p-8 glow-border animate-fade-in">
               <h2 className="text-3xl font-decorative text-amber-400 mb-6 text-center">
-                Detaylı Yorumunuz
+                Your Detailed Reading
               </h2>
               <div className="prose prose-invert prose-amber max-w-none">
                 <div className="text-slate-300 leading-relaxed text-lg whitespace-pre-wrap">
@@ -119,7 +119,7 @@ export function ReadingResultPage({
                     className="inline-flex items-center gap-2 bg-gradient-to-r from-purple-900 via-blue-900 to-purple-900 hover:from-purple-800 hover:via-blue-800 hover:to-purple-800 text-amber-400 font-serif text-lg px-8 py-3 rounded-lg border-2 border-amber-500/50 transition-all transform hover:scale-105"
                   >
                     <Download size={20} />
-                    PDF İndir (Tek Kullanımlık)
+                    Download PDF (Single Use)
                   </a>
                 </div>
               )}
@@ -128,7 +128,7 @@ export function ReadingResultPage({
             <div className="flex items-center justify-center py-12">
               <div className="flex items-center gap-3 text-slate-300">
                 <Loader2 className="animate-spin text-amber-400" size={32} />
-                <p className="text-lg">Yorum oluşturuluyor...</p>
+                <p className="text-lg">Generating your reading...</p>
               </div>
             </div>
           )}

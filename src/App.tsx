@@ -1,23 +1,30 @@
 import { useState } from 'react';
 import { ReadingType, SelectedCard } from './types/reading';
 import { ReadingTypePage } from './pages/ReadingTypePage';
+import { QuestionPage } from './pages/QuestionPage';
 import { CardSelectionPage } from './pages/CardSelectionPage';
 import { ReadingResultPage } from './pages/ReadingResultPage';
 import { generateDetailedReading } from './services/geminiService';
 import { tarotDeck } from './data/tarotDeck';
 
-type AppState = 'type-selection' | 'card-selection' | 'result';
+type AppState = 'type-selection' | 'question' | 'card-selection' | 'result';
 
 function App() {
   const [appState, setAppState] = useState<AppState>('type-selection');
   const [readingType, setReadingType] = useState<ReadingType | null>(null);
   const [selectedCards, setSelectedCards] = useState<SelectedCard[]>([]);
+  const [question, setQuestion] = useState('');
   const [reading, setReading] = useState('');
   const [downloadUrl, setDownloadUrl] = useState<string>();
   const [error, setError] = useState('');
 
   const handleSelectType = (type: ReadingType) => {
     setReadingType(type);
+    setAppState('question');
+  };
+
+  const handleQuestionSubmit = (q: string) => {
+    setQuestion(q);
     setAppState('card-selection');
   };
 
@@ -29,7 +36,7 @@ function App() {
 
     if (!readingType) return;
 
-    const result = await generateDetailedReading(readingType, cards, tarotDeck);
+    const result = await generateDetailedReading(readingType, cards, tarotDeck, question);
 
     if (result.error) {
       setError(result.error);
@@ -41,6 +48,7 @@ function App() {
   const handleReset = () => {
     setAppState('type-selection');
     setReadingType(null);
+    setQuestion('');
     setSelectedCards([]);
     setReading('');
     setDownloadUrl(undefined);
@@ -54,9 +62,15 @@ function App() {
     setError('');
   };
 
+  const handleBackToQuestion = () => {
+    setAppState('question');
+    setSelectedCards([]);
+  };
+
   const handleBackToTypes = () => {
     setAppState('type-selection');
     setReadingType(null);
+    setQuestion('');
     setSelectedCards([]);
   };
 
@@ -66,10 +80,18 @@ function App() {
         <ReadingTypePage onSelectType={handleSelectType} />
       )}
 
+      {appState === 'question' && readingType && (
+        <QuestionPage
+          readingType={readingType}
+          onBack={handleBackToTypes}
+          onContinue={handleQuestionSubmit}
+        />
+      )}
+
       {appState === 'card-selection' && readingType && (
         <CardSelectionPage
           readingType={readingType}
-          onBack={handleBackToTypes}
+          onBack={handleBackToQuestion}
           onComplete={handleCardsSelected}
         />
       )}

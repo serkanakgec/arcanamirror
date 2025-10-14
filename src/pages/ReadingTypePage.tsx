@@ -6,6 +6,9 @@ interface ReadingTypePageProps {
 }
 
 export function ReadingTypePage({ onSelectType }: ReadingTypePageProps) {
+  const classicTypes = readingTypes.filter(t => t.category === 'classic');
+  const thematicTypes = readingTypes.filter(t => t.category === 'thematic');
+
   return (
     <div className="min-h-screen starfield">
       <div className="container mx-auto px-4 py-8 md:py-12">
@@ -18,17 +21,17 @@ export function ReadingTypePage({ onSelectType }: ReadingTypePageProps) {
             <Sparkles className="text-amber-400 w-8 h-8" />
           </div>
           <p className="text-slate-300 text-lg md:text-xl max-w-2xl mx-auto">
-            Kozmik aynaya bakın ve Tarot'un bilgeliğini keşfedin
+            Peer into the cosmic mirror and discover the wisdom of the Tarot
           </p>
         </header>
 
-        <div className="max-w-5xl mx-auto">
-          <h2 className="text-3xl font-decorative text-amber-400 text-center mb-8">
-            Fal Türünü Seçin
-          </h2>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {readingTypes.map((type) => (
+        <div className="max-w-6xl mx-auto space-y-12">
+          <div>
+            <h2 className="text-3xl font-decorative text-amber-400 text-center mb-8">
+              Classic Spreads
+            </h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {classicTypes.map((type) => (
               <button
                 key={type.id}
                 onClick={() => onSelectType(type.id)}
@@ -38,27 +41,60 @@ export function ReadingTypePage({ onSelectType }: ReadingTypePageProps) {
                   <span className="text-4xl">{type.icon}</span>
                   <div className="flex-1">
                     <h3 className="text-xl font-serif text-amber-400 mb-1 group-hover:glow-text transition-all">
-                      {type.nameTr}
+                      {type.name}
                     </h3>
-                    <p className="text-slate-400 text-sm mb-2">{type.name}</p>
                   </div>
                 </div>
-                <p className="text-slate-300 text-sm mb-3">{type.descriptionTr}</p>
+                <p className="text-slate-300 text-sm mb-3">{type.description}</p>
                 <div className="flex items-center justify-between">
                   <span className="text-amber-400/70 text-xs">
-                    {type.cardCount} kart
+                    {type.cardCount} {type.cardCount === 1 ? 'card' : 'cards'}
                   </span>
                   <span className="text-amber-400 text-sm group-hover:translate-x-1 transition-transform">
                     →
                   </span>
                 </div>
-              </button>
-            ))}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <div>
+            <h2 className="text-3xl font-decorative text-amber-400 text-center mb-8">
+              Thematic Readings
+            </h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {thematicTypes.map((type) => (
+                <button
+                  key={type.id}
+                  onClick={() => onSelectType(type.id)}
+                  className="bg-gradient-to-br from-slate-900/80 via-purple-900/20 to-slate-900/80 backdrop-blur-sm border-2 border-amber-500/30 rounded-lg p-6 glow-border hover:border-amber-500/60 transition-all transform hover:scale-105 text-left group"
+                >
+                  <div className="flex items-start gap-4 mb-3">
+                    <span className="text-4xl">{type.icon}</span>
+                    <div className="flex-1">
+                      <h3 className="text-xl font-serif text-amber-400 mb-1 group-hover:glow-text transition-all">
+                        {type.name}
+                      </h3>
+                    </div>
+                  </div>
+                  <p className="text-slate-300 text-sm mb-3">{type.description}</p>
+                  <div className="flex items-center justify-between">
+                    <span className="text-amber-400/70 text-xs">
+                      {type.cardCount} {type.cardCount === 1 ? 'card' : 'cards'}
+                    </span>
+                    <span className="text-amber-400 text-sm group-hover:translate-x-1 transition-transform">
+                      →
+                    </span>
+                  </div>
+                </button>
+              ))}
+            </div>
           </div>
         </div>
 
         <footer className="text-center mt-16 text-slate-400 text-sm">
-          <p>Kartların bilgeliğine güvenin, ancak unutmayın: kaderinizi siz şekillendirirsiniz</p>
+          <p>Trust in the wisdom of the cards, but remember: you shape your own destiny</p>
         </footer>
       </div>
     </div>

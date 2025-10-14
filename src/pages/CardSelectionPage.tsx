@@ -53,13 +53,13 @@ export function CardSelectionPage({ readingType, onBack, onComplete }: CardSelec
             className="flex items-center gap-2 text-amber-400 hover:text-amber-300 transition-colors"
           >
             <ArrowLeft size={20} />
-            <span>Geri</span>
+            <span>Back</span>
           </button>
 
           <div className="flex-1 max-w-md mx-auto">
             <div className="bg-slate-900/50 border-2 border-amber-500/30 rounded-lg p-4">
               <div className="flex items-center justify-between mb-2">
-                <span className="text-amber-400 font-serif">{config.nameTr}</span>
+                <span className="text-amber-400 font-serif">{config.name}</span>
                 <span className="text-slate-300">
                   {selectedCards.length} / {requiredCount}
                 </span>
@@ -78,14 +78,14 @@ export function CardSelectionPage({ readingType, onBack, onComplete }: CardSelec
 
         <div className="text-center mb-8">
           <p className="text-slate-300 text-lg">
-            Sezginizle {requiredCount} kart seçin
+            Trust your intuition and select {requiredCount} {requiredCount === 1 ? 'card' : 'cards'}
           </p>
           <p className="text-slate-400 text-sm mt-2">
-            Bir karta tıklayarak seçin, tekrar tıklayarak seçimi geri alın
+            Click a card to select it, click again to deselect
           </p>
         </div>
 
-        <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8 xl:grid-cols-10 gap-4 mb-8">
+        <div className="grid grid-cols-4 sm:grid-cols-6 md:grid-cols-8 lg:grid-cols-10 xl:grid-cols-13 gap-2 sm:gap-3 mb-8">
           {tarotDeck.map((card) => {
             const selectedCard = selectedCards.find(sc => sc.cardId === card.id);
             const isSelected = !!selectedCard;
@@ -113,7 +113,7 @@ export function CardSelectionPage({ readingType, onBack, onComplete }: CardSelec
                   <div className="card w-full h-full">
                     <div className="card-front">
                       <div className="w-full h-full bg-gradient-to-br from-purple-900 via-blue-900 to-purple-900 rounded-lg border-2 border-amber-500 flex items-center justify-center">
-                        <Sparkles className="text-amber-400 w-8 h-8 animate-pulse" />
+                        <Sparkles className="text-amber-400 w-4 h-4 sm:w-6 sm:h-6 animate-pulse" />
                       </div>
                     </div>
 
@@ -147,12 +147,12 @@ export function CardSelectionPage({ readingType, onBack, onComplete }: CardSelec
               {isProcessing ? (
                 <>
                   <Loader2 className="animate-spin" size={24} />
-                  İşleniyor...
+                  Processing...
                 </>
               ) : (
                 <>
                   <Sparkles size={24} />
-                  Detaylı Yorumu Oluştur
+                  Generate Detailed Reading
                 </>
               )}
             </button>
