@@ -51,7 +51,7 @@ export async function generateOneTimeLink(readingType: ReadingType): Promise<str
   }
 }
 
-export async function validateAndUseLink(token: string): Promise<{ valid: boolean; readingType?: ReadingType }> {
+export async function validateLink(token: string): Promise<{ valid: boolean; readingType?: ReadingType; linkId?: string }> {
   try {
     const { data: link, error: fetchError } = await supabase
       .from('one_time_links')
@@ -65,25 +65,35 @@ export async function validateAndUseLink(token: string): Promise<{ valid: boolea
       return { valid: false };
     }
 
-    const { error: updateError } = await supabase
+    return {
+      valid: true,
+      readingType: link.reading_type as ReadingType,
+      linkId: link.id
+    };
+  } catch (error) {
+    console.error('Error validating link:', error);
+    return { valid: false };
+  }
+}
+
+export async function markLinkAsUsed(linkId: string): Promise<boolean> {
+  try {
+    const { error } = await supabase
       .from('one_time_links')
       .update({
         is_used: true,
         used_at: new Date().toISOString()
       })
-      .eq('id', link.id);
+      .eq('id', linkId);
 
-    if (updateError) {
-      console.error('Error marking link as used:', updateError);
-      return { valid: false };
+    if (error) {
+      console.error('Error marking link as used:', error);
+      return false;
     }
 
-    return {
-      valid: true,
-      readingType: link.reading_type as ReadingType
-    };
+    return true;
   } catch (error) {
-    console.error('Error validating link:', error);
-    return { valid: false };
+    console.error('Error:', error);
+    return false;
   }
 }

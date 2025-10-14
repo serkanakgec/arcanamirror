@@ -5,7 +5,7 @@ import { QuestionPage } from './pages/QuestionPage';
 import { CardSelectionPage } from './pages/CardSelectionPage';
 import { ReadingResultPage } from './pages/ReadingResultPage';
 import { generateDetailedReading } from './services/geminiService';
-import { validateAndUseLink } from './services/linkService';
+import { validateLink, markLinkAsUsed } from './services/linkService';
 import { tarotDeck } from './data/tarotDeck';
 
 type AppState = 'type-selection' | 'question' | 'card-selection' | 'result';
@@ -18,25 +18,26 @@ function App() {
   const [reading, setReading] = useState('');
   const [downloadUrl, setDownloadUrl] = useState<string>();
   const [error, setError] = useState('');
-  const [linkUsed, setLinkUsed] = useState(false);
+  const [linkId, setLinkId] = useState<string | null>(null);
 
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
     const linkToken = urlParams.get('link');
 
-    if (linkToken && !linkUsed) {
-      validateAndUseLink(linkToken).then(result => {
-        if (result.valid && result.readingType) {
+    if (linkToken) {
+      validateLink(linkToken).then(result => {
+        if (result.valid && result.readingType && result.linkId) {
           setReadingType(result.readingType);
+          setLinkId(result.linkId);
           setAppState('question');
-          setLinkUsed(true);
           window.history.replaceState({}, '', window.location.pathname);
         } else {
-          alert('This link is invalid or has already been used.');
+          alert('This link is invalid, expired, or has already been used.');
+          window.location.href = '/';
         }
       });
     }
-  }, [linkUsed]);
+  }, []);
 
   const handleSelectType = (type: ReadingType) => {
     setReadingType(type);
@@ -62,6 +63,11 @@ function App() {
       setError(result.error);
     } else {
       setReading(result.reading);
+
+      if (linkId) {
+        await markLinkAsUsed(linkId);
+        setLinkId(null);
+      }
     }
   };
 
@@ -73,6 +79,7 @@ function App() {
     setReading('');
     setDownloadUrl(undefined);
     setError('');
+    setLinkId(null);
   };
 
   return (
@@ -100,6 +107,7 @@ function App() {
           readingType={readingType}
           selectedCards={selectedCards}
           reading={reading}
+          question={question}
           downloadUrl={downloadUrl}
           onReset={handleReset}
         />
