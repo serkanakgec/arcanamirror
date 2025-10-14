@@ -30,7 +30,7 @@ const majorArcana: TarotCard[] = [
     reversedTr: 'Pervasızlık, saflık, kullanılmak',
     symbolism: 'A young person stands at the edge of a cliff',
     symbolismTr: 'Genç bir kişi uçurumun kenarında duruyor',
-    imageUrl: 'https://images.pexels.com/photos/6896372/pexels-photo-6896372.jpeg?auto=compress&cs=tinysrgb&w=400'
+    imageUrl: 'https://www.sacred-texts.com/tarot/pkt/img/ar00.jpg'
   },
   {
     id: 'rw_01',
@@ -46,7 +46,7 @@ const majorArcana: TarotCard[] = [
     reversedTr: 'Manipülasyon, zayıf planlama, kullanılmayan yetenekler',
     symbolism: 'The Magician channels divine energy',
     symbolismTr: 'Büyücü ilahi enerjiyi kanalize eder',
-    imageUrl: 'https://images.pexels.com/photos/8066665/pexels-photo-8066665.jpeg?auto=compress&cs=tinysrgb&w=400'
+    imageUrl: 'https://www.sacred-texts.com/tarot/pkt/img/ar01.jpg'
   },
   {
     id: 'rw_02',
@@ -62,9 +62,23 @@ const majorArcana: TarotCard[] = [
     reversedTr: 'Sırlar, sezgiden kopukluk',
     symbolism: 'She guards the threshold between realms',
     symbolismTr: 'Alemler arasındaki eşiği korur',
-    imageUrl: 'https://images.pexels.com/photos/8066820/pexels-photo-8066820.jpeg?auto=compress&cs=tinysrgb&w=400'
+    imageUrl: 'https://www.sacred-texts.com/tarot/pkt/img/ar02.jpg'
   }
 ];
+
+const getCardImageUrl = (cardNumber: number): string => {
+  if (cardNumber < 22) {
+    return `https://www.sacred-texts.com/tarot/pkt/img/ar${cardNumber.toString().padStart(2, '0')}.jpg`;
+  }
+
+  const minorIndex = cardNumber - 22;
+  const suits = ['wa', 'cu', 'sw', 'pe'];
+  const suitIndex = Math.floor(minorIndex / 14);
+  const rank = (minorIndex % 14) + 1;
+  const suit = suits[suitIndex];
+
+  return `https://www.sacred-texts.com/tarot/pkt/img/${suit}${rank.toString().padStart(2, '0')}.jpg`;
+};
 
 const minorCards: TarotCard[] = [];
 for (let i = 3; i < 78; i++) {
@@ -83,7 +97,7 @@ for (let i = 3; i < 78; i++) {
     reversedTr: 'Zorluklar ve dersler',
     symbolism: 'Ancient wisdom and guidance',
     symbolismTr: 'Kadim bilgelik ve rehberlik',
-    imageUrl: `https://images.pexels.com/photos/${6896372 + i}/pexels-photo-${6896372 + i}.jpeg?auto=compress&cs=tinysrgb&w=400`
+    imageUrl: getCardImageUrl(i)
   });
 }
 
