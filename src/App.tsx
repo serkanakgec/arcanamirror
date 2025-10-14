@@ -1,10 +1,11 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { ReadingType, SelectedCard } from './types/reading';
 import { ReadingTypePage } from './pages/ReadingTypePage';
 import { QuestionPage } from './pages/QuestionPage';
 import { CardSelectionPage } from './pages/CardSelectionPage';
 import { ReadingResultPage } from './pages/ReadingResultPage';
 import { generateDetailedReading } from './services/geminiService';
+import { validateAndUseLink } from './services/linkService';
 import { tarotDeck } from './data/tarotDeck';
 
 type AppState = 'type-selection' | 'question' | 'card-selection' | 'result';
@@ -17,6 +18,25 @@ function App() {
   const [reading, setReading] = useState('');
   const [downloadUrl, setDownloadUrl] = useState<string>();
   const [error, setError] = useState('');
+  const [linkUsed, setLinkUsed] = useState(false);
+
+  useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const linkToken = urlParams.get('link');
+
+    if (linkToken && !linkUsed) {
+      validateAndUseLink(linkToken).then(result => {
+        if (result.valid && result.readingType) {
+          setReadingType(result.readingType);
+          setAppState('question');
+          setLinkUsed(true);
+          window.history.replaceState({}, '', window.location.pathname);
+        } else {
+          alert('This link is invalid or has already been used.');
+        }
+      });
+    }
+  }, [linkUsed]);
 
   const handleSelectType = (type: ReadingType) => {
     setReadingType(type);
@@ -55,25 +75,6 @@ function App() {
     setError('');
   };
 
-  const handleBackToSelection = () => {
-    setAppState('card-selection');
-    setSelectedCards([]);
-    setReading('');
-    setError('');
-  };
-
-  const handleBackToQuestion = () => {
-    setAppState('question');
-    setSelectedCards([]);
-  };
-
-  const handleBackToTypes = () => {
-    setAppState('type-selection');
-    setReadingType(null);
-    setQuestion('');
-    setSelectedCards([]);
-  };
-
   return (
     <>
       {appState === 'type-selection' && (
@@ -83,7 +84,6 @@ function App() {
       {appState === 'question' && readingType && (
         <QuestionPage
           readingType={readingType}
-          onBack={handleBackToTypes}
           onContinue={handleQuestionSubmit}
         />
       )}
@@ -91,7 +91,6 @@ function App() {
       {appState === 'card-selection' && readingType && (
         <CardSelectionPage
           readingType={readingType}
-          onBack={handleBackToQuestion}
           onComplete={handleCardsSelected}
         />
       )}
@@ -103,7 +102,6 @@ function App() {
           reading={reading}
           downloadUrl={downloadUrl}
           onReset={handleReset}
-          onBack={handleBackToSelection}
         />
       )}
 

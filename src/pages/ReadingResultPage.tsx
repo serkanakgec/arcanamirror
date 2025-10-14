@@ -11,7 +11,6 @@ interface ReadingResultPageProps {
   reading: string;
   downloadUrl?: string;
   onReset: () => void;
-  onBack: () => void;
 }
 
 export function ReadingResultPage({
@@ -19,8 +18,7 @@ export function ReadingResultPage({
   selectedCards,
   reading,
   downloadUrl,
-  onReset,
-  onBack
+  onReset
 }: ReadingResultPageProps) {
   const [selectedCardForModal, setSelectedCardForModal] = useState<string | null>(null);
 
@@ -37,15 +35,7 @@ export function ReadingResultPage({
   return (
     <div className="min-h-screen starfield">
       <div className="container mx-auto px-4 py-8">
-        <div className="mb-8 flex items-center justify-between">
-          <button
-            onClick={onBack}
-            className="flex items-center gap-2 text-amber-400 hover:text-amber-300 transition-colors"
-          >
-            <ArrowLeft size={20} />
-            <span>Card Selection</span>
-          </button>
-
+        <div className="mb-8 flex items-center justify-end">
           <button
             onClick={onReset}
             className="flex items-center gap-2 text-amber-400 hover:text-amber-300 transition-colors"

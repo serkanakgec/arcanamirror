@@ -4,11 +4,10 @@ import { ReadingType, readingTypes } from '../types/reading';
 
 interface QuestionPageProps {
   readingType: ReadingType;
-  onBack: () => void;
   onContinue: (question: string) => void;
 }
 
-export function QuestionPage({ readingType, onBack, onContinue }: QuestionPageProps) {
+export function QuestionPage({ readingType, onContinue }: QuestionPageProps) {
   const [question, setQuestion] = useState('');
   const [error, setError] = useState('');
 
@@ -25,13 +24,6 @@ export function QuestionPage({ readingType, onBack, onContinue }: QuestionPagePr
   return (
     <div className="min-h-screen starfield">
       <div className="container mx-auto px-4 py-8 md:py-12">
-        <button
-          onClick={onBack}
-          className="flex items-center gap-2 text-amber-400 hover:text-amber-300 transition-colors mb-8"
-        >
-          <ArrowLeft size={20} />
-          <span>Back</span>
-        </button>
 
         <div className="max-w-2xl mx-auto animate-fade-in">
           <header className="text-center mb-8">

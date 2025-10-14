@@ -5,7 +5,6 @@ import { ReadingType, readingTypes, SelectedCard } from '../types/reading';
 
 interface CardSelectionPageProps {
   readingType: ReadingType;
-  onBack: () => void;
   onComplete: (selectedCards: SelectedCard[]) => void;
 }
 
@@ -15,7 +14,7 @@ interface CardPosition {
   y: number;
 }
 
-export function CardSelectionPage({ readingType, onBack, onComplete }: CardSelectionPageProps) {
+export function CardSelectionPage({ readingType, onComplete }: CardSelectionPageProps) {
   const [selectedCards, setSelectedCards] = useState<SelectedCard[]>([]);
   const [isProcessing, setIsProcessing] = useState(false);
 
@@ -61,16 +60,8 @@ export function CardSelectionPage({ readingType, onBack, onComplete }: CardSelec
   return (
     <div className="min-h-screen starfield">
       <div className="container mx-auto px-4 py-8">
-        <div className="mb-8 flex items-center justify-between">
-          <button
-            onClick={onBack}
-            className="flex items-center gap-2 text-amber-400 hover:text-amber-300 transition-colors"
-          >
-            <ArrowLeft size={20} />
-            <span>Back</span>
-          </button>
-
-          <div className="flex-1 max-w-md mx-auto">
+        <div className="mb-8 flex items-center justify-center">
+          <div className="flex-1 max-w-md">
             <div className="bg-slate-900/50 border-2 border-amber-500/30 rounded-lg p-4">
               <div className="flex items-center justify-between mb-2">
                 <span className="text-amber-400 font-serif">{config.name}</span>
@@ -86,8 +77,6 @@ export function CardSelectionPage({ readingType, onBack, onComplete }: CardSelec
               </div>
             </div>
           </div>
-
-          <div className="w-20"></div>
         </div>
 
         <div className="text-center mb-8">
