@@ -13,7 +13,7 @@ export interface OneTimeLink {
   is_used: boolean;
   created_at: string;
   used_at: string | null;
-  expires_at: string;
+  expires_at: string | null;
 }
 
 function generateToken(): string {
@@ -25,15 +25,13 @@ function generateToken(): string {
 export async function generateOneTimeLink(readingType: ReadingType): Promise<string | null> {
   try {
     const token = generateToken();
-    const expiresAt = new Date();
-    expiresAt.setHours(expiresAt.getHours() + 24);
 
     const { data, error } = await supabase
       .from('one_time_links')
       .insert({
         link_token: token,
         reading_type: readingType,
-        expires_at: expiresAt.toISOString()
+        expires_at: null
       })
       .select()
       .maybeSingle();
@@ -58,7 +56,6 @@ export async function validateLink(token: string): Promise<{ valid: boolean; rea
       .select('*')
       .eq('link_token', token)
       .eq('is_used', false)
-      .gt('expires_at', new Date().toISOString())
       .maybeSingle();
 
     if (fetchError || !link) {

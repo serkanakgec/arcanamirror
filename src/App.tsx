@@ -7,6 +7,7 @@ import { ReadingResultPage } from './pages/ReadingResultPage';
 import { generateDetailedReading } from './services/geminiService';
 import { validateLink, markLinkAsUsed } from './services/linkService';
 import { tarotDeck } from './data/tarotDeck';
+import { Language } from './i18n/translations';
 
 type AppState = 'type-selection' | 'question' | 'card-selection' | 'result';
 
@@ -19,6 +20,14 @@ function App() {
   const [downloadUrl, setDownloadUrl] = useState<string>();
   const [error, setError] = useState('');
   const [isLinkSession, setIsLinkSession] = useState(false);
+  const [language, setLanguage] = useState<Language>('en');
+
+  useEffect(() => {
+    const savedLang = localStorage.getItem('language') as Language;
+    if (savedLang) {
+      setLanguage(savedLang);
+    }
+  }, []);
 
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
@@ -34,12 +43,17 @@ function App() {
           setAppState('question');
           window.history.replaceState({}, '', window.location.pathname);
         } else {
-          alert('This link is invalid, expired, or has already been used.');
+          alert('This link is invalid or has already been used.');
           window.location.href = '/';
         }
       });
     }
   }, []);
+
+  const handleLanguageChange = (lang: Language) => {
+    setLanguage(lang);
+    localStorage.setItem('language', lang);
+  };
 
   const handleSelectType = (type: ReadingType) => {
     setReadingType(type);
@@ -71,13 +85,19 @@ function App() {
   return (
     <>
       {appState === 'type-selection' && (
-        <ReadingTypePage onSelectType={handleSelectType} />
+        <ReadingTypePage
+          onSelectType={handleSelectType}
+          language={language}
+          onLanguageChange={handleLanguageChange}
+        />
       )}
 
       {appState === 'question' && readingType && (
         <QuestionPage
           readingType={readingType}
           onContinue={handleQuestionSubmit}
+          language={language}
+          onLanguageChange={handleLanguageChange}
         />
       )}
 
@@ -85,6 +105,8 @@ function App() {
         <CardSelectionPage
           readingType={readingType}
           onComplete={handleCardsSelected}
+          language={language}
+          onLanguageChange={handleLanguageChange}
         />
       )}
 
@@ -95,6 +117,8 @@ function App() {
           reading={reading}
           question={question}
           downloadUrl={downloadUrl}
+          language={language}
+          onLanguageChange={handleLanguageChange}
         />
       )}
 
