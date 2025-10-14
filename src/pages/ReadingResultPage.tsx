@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Download, Loader2, RefreshCw } from 'lucide-react';
+import { Download, Loader2 } from 'lucide-react';
 import { SelectedCard, ReadingType, readingTypes } from '../types/reading';
 import { tarotDeck } from '../data/tarotDeck';
 import { CardModal } from '../components/CardModal';
@@ -11,7 +11,6 @@ interface ReadingResultPageProps {
   reading: string;
   question: string;
   downloadUrl?: string;
-  onReset: () => void;
 }
 
 export function ReadingResultPage({
@@ -19,8 +18,7 @@ export function ReadingResultPage({
   selectedCards,
   reading,
   question,
-  downloadUrl,
-  onReset
+  downloadUrl
 }: ReadingResultPageProps) {
   const [selectedCardForModal, setSelectedCardForModal] = useState<string | null>(null);
   const [isDownloading, setIsDownloading] = useState(false);
@@ -98,16 +96,6 @@ Remember: You shape your own destiny.
   return (
     <div className="min-h-screen starfield">
       <div className="container mx-auto px-4 py-8">
-        <div className="mb-8 flex items-center justify-end">
-          <button
-            onClick={onReset}
-            className="flex items-center gap-2 text-amber-400 hover:text-amber-300 transition-colors"
-          >
-            <RefreshCw size={20} />
-            <span>New Reading</span>
-          </button>
-        </div>
-
         <header className="text-center mb-12 animate-fade-in">
           <h1 className="text-4xl md:text-5xl font-decorative text-amber-400 glow-text mb-2">
             {config.name}

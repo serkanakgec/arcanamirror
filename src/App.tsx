@@ -18,17 +18,19 @@ function App() {
   const [reading, setReading] = useState('');
   const [downloadUrl, setDownloadUrl] = useState<string>();
   const [error, setError] = useState('');
-  const [linkId, setLinkId] = useState<string | null>(null);
+  const [isLinkSession, setIsLinkSession] = useState(false);
 
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
     const linkToken = urlParams.get('link');
 
     if (linkToken) {
-      validateLink(linkToken).then(result => {
+      validateLink(linkToken).then(async result => {
         if (result.valid && result.readingType && result.linkId) {
+          await markLinkAsUsed(result.linkId);
+
           setReadingType(result.readingType);
-          setLinkId(result.linkId);
+          setIsLinkSession(true);
           setAppState('question');
           window.history.replaceState({}, '', window.location.pathname);
         } else {
@@ -63,23 +65,7 @@ function App() {
       setError(result.error);
     } else {
       setReading(result.reading);
-
-      if (linkId) {
-        await markLinkAsUsed(linkId);
-        setLinkId(null);
-      }
     }
-  };
-
-  const handleReset = () => {
-    setAppState('type-selection');
-    setReadingType(null);
-    setQuestion('');
-    setSelectedCards([]);
-    setReading('');
-    setDownloadUrl(undefined);
-    setError('');
-    setLinkId(null);
   };
 
   return (
@@ -109,7 +95,6 @@ function App() {
           reading={reading}
           question={question}
           downloadUrl={downloadUrl}
-          onReset={handleReset}
         />
       )}
 
