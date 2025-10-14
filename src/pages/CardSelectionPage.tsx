@@ -122,7 +122,7 @@ export function CardSelectionPage({ readingType, onBack, onComplete }: CardSelec
                 {!isSelected ? (
                   <div className="aspect-[2/3] w-full">
                     <img
-                      src="https://www.sacred-texts.com/tarot/pkt/img/back.jpg"
+                      src="https://previews.123rf.com/images/antusenoktanya/antusenoktanya2304/antusenoktanya230400014/204295155-mystical-tarot-card-witch-holding-the-sun-engraved-on-a-black-background-background-for-stories.jpg"
                       alt="Card back"
                       className="w-full h-full object-cover rounded-lg border-2 border-amber-500/50 shadow-lg"
                     />
