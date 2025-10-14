@@ -69,11 +69,13 @@ Please provide a detailed, compassionate tarot reading in English specifically t
    Directly address their question and summarize the general message of the selected cards.
 
 2. CARD-BY-CARD ANALYSIS
-   For each card:
-   - Card name and orientation
+   For each card, use the EXACT card name (e.g., "The Fool", "The Magician", etc.):
+   - Card name (use the exact card name, not position numbers) and orientation
    - Key themes (3-5 keywords)
    - Symbolism and meaning (2-4 sentences)
    - Specific relevance to their question
+
+   IMPORTANT: Always refer to cards by their names (e.g., "The Fool", "The Magician"), NEVER by position numbers.
 
 3. THE CARDS' STORY
    Explain how the cards connect to tell a cohesive story (4-6 sentences). Show how they relate to each other and the journey they reveal regarding the user's question.

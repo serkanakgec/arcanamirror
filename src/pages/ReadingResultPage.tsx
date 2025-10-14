@@ -3,6 +3,7 @@ import { ArrowLeft, Download, Loader2, RefreshCw } from 'lucide-react';
 import { SelectedCard, ReadingType, readingTypes } from '../types/reading';
 import { tarotDeck } from '../data/tarotDeck';
 import { CardModal } from '../components/CardModal';
+import { TypewriterText } from '../components/TypewriterText';
 
 interface ReadingResultPageProps {
   readingType: ReadingType;
@@ -80,7 +81,7 @@ export function ReadingResultPage({
                     <div className="relative">
                       <img
                         src={card.imageUrl}
-                        alt={card.nameTr}
+                        alt={card.name}
                         className={`w-32 h-48 object-cover rounded-lg border-2 border-amber-500/50 shadow-lg group-hover:border-amber-500 transition-all group-hover:scale-105 ${
                           sc.orientation === 'reversed' ? 'rotate-180' : ''
                         }`}
@@ -107,8 +108,8 @@ export function ReadingResultPage({
                 Your Detailed Reading
               </h2>
               <div className="prose prose-invert prose-amber max-w-none">
-                <div className="text-slate-300 leading-relaxed text-lg whitespace-pre-wrap">
-                  {reading}
+                <div className="text-slate-300 leading-relaxed text-lg">
+                  <TypewriterText text={reading} speed={15} />
                 </div>
               </div>
 

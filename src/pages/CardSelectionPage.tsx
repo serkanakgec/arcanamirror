@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { ArrowLeft, Sparkles, Loader2 } from 'lucide-react';
 import { tarotDeck } from '../data/tarotDeck';
 import { ReadingType, readingTypes, SelectedCard } from '../types/reading';
@@ -9,6 +9,12 @@ interface CardSelectionPageProps {
   onComplete: (selectedCards: SelectedCard[]) => void;
 }
 
+interface CardPosition {
+  id: string;
+  x: number;
+  y: number;
+}
+
 export function CardSelectionPage({ readingType, onBack, onComplete }: CardSelectionPageProps) {
   const [selectedCards, setSelectedCards] = useState<SelectedCard[]>([]);
   const [isProcessing, setIsProcessing] = useState(false);
@@ -17,23 +23,27 @@ export function CardSelectionPage({ readingType, onBack, onComplete }: CardSelec
   const requiredCount = config.cardCount;
   const isComplete = selectedCards.length === requiredCount;
 
+  const shuffledDeck = useMemo(() => {
+    return [...tarotDeck].sort(() => Math.random() - 0.5);
+  }, [readingType]);
+
   const handleCardClick = (cardId: string) => {
     const existingIndex = selectedCards.findIndex(sc => sc.cardId === cardId);
 
     if (existingIndex !== -1) {
-      setSelectedCards(selectedCards.filter(sc => sc.cardId !== cardId));
-    } else {
-      if (selectedCards.length < requiredCount) {
-        const orientation: 'upright' | 'reversed' = Math.random() > 0.7 ? 'reversed' : 'upright';
-        setSelectedCards([
-          ...selectedCards,
-          {
-            cardId,
-            position: selectedCards.length + 1,
-            orientation
-          }
-        ]);
-      }
+      return;
+    }
+
+    if (selectedCards.length < requiredCount) {
+      const orientation: 'upright' | 'reversed' = Math.random() > 0.7 ? 'reversed' : 'upright';
+      setSelectedCards([
+        ...selectedCards,
+        {
+          cardId,
+          position: selectedCards.length + 1,
+          orientation
+        }
+      ]);
     }
   };
 
@@ -42,6 +52,10 @@ export function CardSelectionPage({ readingType, onBack, onComplete }: CardSelec
     setTimeout(() => {
       onComplete(selectedCards);
     }, 500);
+  };
+
+  const getCardData = (cardId: string) => {
+    return tarotDeck.find(c => c.id === cardId);
   };
 
   return (
@@ -81,12 +95,12 @@ export function CardSelectionPage({ readingType, onBack, onComplete }: CardSelec
             Trust your intuition and select {requiredCount} {requiredCount === 1 ? 'card' : 'cards'}
           </p>
           <p className="text-slate-400 text-sm mt-2">
-            Click a card to select it, click again to deselect
+            Click a card to reveal it - once selected, it cannot be deselected
           </p>
         </div>
 
-        <div className="grid grid-cols-4 sm:grid-cols-6 md:grid-cols-8 lg:grid-cols-10 xl:grid-cols-13 gap-2 sm:gap-3 mb-8">
-          {tarotDeck.map((card) => {
+        <div className="grid grid-cols-6 sm:grid-cols-8 md:grid-cols-10 lg:grid-cols-12 xl:grid-cols-13 gap-3 mb-8">
+          {shuffledDeck.map((card) => {
             const selectedCard = selectedCards.find(sc => sc.cardId === card.id);
             const isSelected = !!selectedCard;
 
@@ -94,42 +108,49 @@ export function CardSelectionPage({ readingType, onBack, onComplete }: CardSelec
               <button
                 key={card.id}
                 onClick={() => handleCardClick(card.id)}
-                disabled={!isSelected && selectedCards.length >= requiredCount}
-                className={`relative aspect-[2/3] rounded-lg transition-all duration-300 ${
+                disabled={isSelected || selectedCards.length >= requiredCount}
+                className={`relative transition-all duration-300 ${
                   isSelected
-                    ? 'ring-4 ring-amber-400 shadow-lg shadow-amber-500/50 scale-105'
-                    : 'hover:scale-105 hover:shadow-lg hover:shadow-purple-500/30'
+                    ? 'z-20'
+                    : 'z-10'
                 } ${
                   !isSelected && selectedCards.length >= requiredCount
                     ? 'opacity-30 cursor-not-allowed'
-                    : 'cursor-pointer'
+                    : 'cursor-pointer hover:scale-105'
                 }`}
               >
-                <div
-                  className={`card-container w-full h-full ${
-                    isSelected ? 'flipped' : ''
-                  }`}
-                >
-                  <div className="card w-full h-full">
-                    <div className="card-front">
-                      <div className="w-full h-full bg-gradient-to-br from-purple-900 via-blue-900 to-purple-900 rounded-lg border-2 border-amber-500 flex items-center justify-center">
-                        <Sparkles className="text-amber-400 w-4 h-4 sm:w-6 sm:h-6 animate-pulse" />
-                      </div>
-                    </div>
-
-                    <div className="card-back">
+                {!isSelected ? (
+                  <div className="aspect-[2/3] w-full">
+                    <img
+                      src="https://www.sacred-texts.com/tarot/pkt/img/back.jpg"
+                      alt="Card back"
+                      className="w-full h-full object-cover rounded-lg border-2 border-amber-500/50 shadow-lg"
+                    />
+                  </div>
+                ) : (
+                  <div className="relative">
+                    <div
+                      className={`aspect-[2/3] ${
+                        selectedCard.orientation === 'reversed' ? 'rotate-180' : ''
+                      }`}
+                    >
                       <img
                         src={card.imageUrl}
                         alt={card.name}
-                        className="w-full h-full object-cover rounded-lg border-2 border-amber-500"
+                        className="w-full h-full object-cover rounded-lg border-4 border-amber-400 shadow-2xl shadow-amber-500/50 scale-125"
                       />
                     </div>
-                  </div>
-                </div>
-
-                {isSelected && (
-                  <div className="absolute -top-2 -right-2 w-8 h-8 bg-amber-400 rounded-full flex items-center justify-center text-slate-900 font-bold text-sm shadow-lg animate-fade-in">
-                    {selectedCard.position}
+                    <div className="absolute -top-3 -right-3 w-8 h-8 bg-amber-400 rounded-full flex items-center justify-center text-slate-900 font-bold text-sm shadow-lg z-30">
+                      {selectedCard.position}
+                    </div>
+                    <div className="absolute -bottom-8 left-1/2 transform -translate-x-1/2 whitespace-nowrap">
+                      <p className="text-amber-400 text-xs font-serif text-center">
+                        {card.name}
+                      </p>
+                      {selectedCard.orientation === 'reversed' && (
+                        <p className="text-amber-400/70 text-xs text-center">(Reversed)</p>
+                      )}
+                    </div>
                   </div>
                 )}
               </button>
@@ -138,7 +159,7 @@ export function CardSelectionPage({ readingType, onBack, onComplete }: CardSelec
         </div>
 
         {isComplete && (
-          <div className="flex justify-center animate-fade-in">
+          <div className="flex justify-center animate-fade-in mt-16">
             <button
               onClick={handleGenerate}
               disabled={isProcessing}
