@@ -73,7 +73,7 @@ function App() {
 
     if (!readingType) return;
 
-    const result = await generateDetailedReading(readingType, cards, tarotDeck, question);
+    const result = await generateDetailedReading(readingType, cards, tarotDeck, question, language);
 
     if (result.error) {
       setError(result.error);

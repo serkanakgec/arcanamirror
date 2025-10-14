@@ -1,7 +1,8 @@
-export type Language = 'en' | 'de' | 'it' | 'fr' | 'ru' | 'zh' | 'es' | 'pt' | 'nl' | 'ja' | 'fa' | 'ar' | 'el';
+export type Language = 'en' | 'tr' | 'de' | 'it' | 'fr' | 'ru' | 'zh' | 'es' | 'pt' | 'nl' | 'ja' | 'fa' | 'ar' | 'el';
 
 export const languages: { code: Language; name: string; flag: string }[] = [
   { code: 'en', name: 'English', flag: '🇬🇧' },
+  { code: 'tr', name: 'Türkçe', flag: '🇹🇷' },
   { code: 'de', name: 'Deutsch', flag: '🇩🇪' },
   { code: 'it', name: 'Italiano', flag: '🇮🇹' },
   { code: 'fr', name: 'Français', flag: '🇫🇷' },
@@ -445,6 +446,39 @@ export const translations = {
     preparing: 'Προετοιμασία...',
     linkInvalid: 'Αυτός ο σύνδεσμος δεν είναι έγκυρος ή έχει ήδη χρησιμοποιηθεί.',
     pleaseEnterQuestion: 'Παρακαλώ εισάγετε μια ερώτηση για να καθοδηγήσετε την ανάγνωσή σας.'
+  },
+  tr: {
+    appName: 'Arcana Mirror',
+    appTagline: 'Kozmik aynaya bakın ve Tarot\'un bilgeliğini keşfedin',
+    classicSpreads: 'Klasik Yayılımlar',
+    thematicReadings: 'Tematik Okumalar',
+    generateLink: 'Link Oluştur',
+    generating: 'Oluşturuluyor...',
+    copy: 'Kopyala',
+    copied: 'Kopyalandı!',
+    oneTimeLink: 'Tek kullanımlık link (sadece bir kez kullanılabilir)',
+    cards: 'kart',
+    card: 'kart',
+    trustDestiny: 'Kartların bilgeliğine güvenin, ama unutmayın: kendi kaderinizi siz şekillendirirsiniz',
+    whatGuidance: 'Ne tür bir rehberlik arıyorsunuz?',
+    askQuestion: 'Açık uçlu bir soru sorun. Kartlar özel sorunuza yanıt verecek ve daha derin içgörüler sağlayacaktır.',
+    enterQuestion: 'Sorunuzu açık bir kalple girin... (örn. \'Kariyer yolum hakkında ne bilmem gerekiyor?\', \'İlişkilerimi nasıl geliştirebilirim?\')',
+    continueToCards: 'Kart Seçimine Devam Et',
+    youWillSelect: 'Seçeceksiniz',
+    forThisReading: 'bu okuma için',
+    trustIntuition: 'İçgüdülerinize güvenin ve seçin',
+    clickToReveal: 'Açmak için bir karta tıklayın - bir kez seçildikten sonra, seçimi kaldıramazsınız',
+    cardsSelected: 'kart seçildi',
+    generateReading: 'Detaylı Okuma Oluştur',
+    selectedCards: 'Seçilen Kartlar',
+    reversed: 'Ters',
+    yourReading: 'Detaylı Okumanız',
+    readingReady: 'Okumanız hazır',
+    channeling: 'Kozmik bilgelik aktarılıyor...',
+    downloadReading: 'Okumayı İndir',
+    preparing: 'Hazırlanıyor...',
+    linkInvalid: 'Bu link geçersiz veya zaten kullanılmış.',
+    pleaseEnterQuestion: 'Lütfen okumanıza rehberlik etmesi için bir soru girin.'
   }
 };
 

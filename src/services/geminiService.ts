@@ -1,10 +1,31 @@
 import { TarotCard } from '../data/tarotDeck';
 import { SelectedCard, ReadingType, readingTypes } from '../types/reading';
+import { Language } from '../i18n/translations';
 
 export interface ReadingResponse {
   reading: string;
   error?: string;
 }
+
+const getLanguageName = (lang: Language): string => {
+  const names: Record<Language, string> = {
+    en: 'English',
+    tr: 'Turkish (Türkçe)',
+    de: 'German (Deutsch)',
+    it: 'Italian (Italiano)',
+    fr: 'French (Français)',
+    ru: 'Russian (Русский)',
+    zh: 'Chinese (中文)',
+    es: 'Spanish (Español)',
+    pt: 'Portuguese (Português)',
+    nl: 'Dutch (Nederlands)',
+    ja: 'Japanese (日本語)',
+    fa: 'Persian (فارسی)',
+    ar: 'Arabic (العربية)',
+    el: 'Greek (Ελληνικά)'
+  };
+  return names[lang] || 'English';
+};
 
 const getReadingTypeContext = (readingType: ReadingType): string => {
   const contexts: Record<ReadingType, string> = {
@@ -28,7 +49,8 @@ export async function generateDetailedReading(
   readingType: ReadingType,
   selectedCards: SelectedCard[],
   deck: TarotCard[],
-  question: string
+  question: string,
+  language: Language = 'en'
 ): Promise<ReadingResponse> {
   const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
 
@@ -63,7 +85,7 @@ For this reading, they selected these cards (in order):
 
 ${cardsInfo}
 
-Please provide a detailed, compassionate tarot reading in English specifically tailored to this ${readingConfig?.name || readingType} reading type, with the following format:
+Please provide a detailed, compassionate tarot reading in ${getLanguageName(language)} specifically tailored to this ${readingConfig?.name || readingType} reading type, with the following format:
 
 1. BRIEF SUMMARY (2-4 sentences)
    Directly address their question and summarize the general message of the selected cards.
