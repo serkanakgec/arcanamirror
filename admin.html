@@ -188,6 +188,10 @@
                 <label for="supabaseKey">Supabase Anon Key:</label>
                 <input type="text" id="supabaseKey" placeholder="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..." required>
             </div>
+            <button onclick="testConnection()" id="testBtn" style="margin-top: 10px; background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);">
+                🔍 Bağlantıyı Test Et
+            </button>
+            <div id="testResult" style="margin-top: 10px; padding: 10px; border-radius: 6px; display: none; font-size: 13px;"></div>
         </div>
 
         <div class="info">
@@ -209,10 +213,6 @@
                     <option value="year">📅 Yıllık Okuma (12 Kart)</option>
                 </optgroup>
                 <optgroup label="Tematik Okumalar">
-                    <option value="relationship">❤️ İlişki & Aşk</option>
-                    <option value="career">💼 Kariyer & Para</option>
-                    <option value="soulmate">💕 Ruh Eşi</option>
-                    <option value="year">📅 Yıllık Okuma (12 Kart)</option>
                     <option value="divination">🔮 Kehanet Tarot</option>
                     <option value="psychological">🧠 Psikolojik Tarot</option>
                     <option value="spiritual">🕉️ Manevi Rehberlik</option>
@@ -264,6 +264,57 @@
             }
         }
 
+        async function testConnection() {
+            const testResultDiv = document.getElementById('testResult');
+            const testBtn = document.getElementById('testBtn');
+
+            if (!initSupabase()) {
+                return;
+            }
+
+            testBtn.disabled = true;
+            testBtn.textContent = '⏳ Test ediliyor...';
+            testResultDiv.style.display = 'none';
+
+            try {
+                const { data, error } = await supabaseClient
+                    .from('one_time_links')
+                    .select('id')
+                    .limit(1);
+
+                if (error) {
+                    throw error;
+                }
+
+                testResultDiv.style.display = 'block';
+                testResultDiv.style.background = 'rgba(16, 185, 129, 0.1)';
+                testResultDiv.style.border = '1px solid #10b981';
+                testResultDiv.style.color = '#10b981';
+                testResultDiv.innerHTML = '✅ Bağlantı başarılı! Veritabanına erişim sağlandı.';
+            } catch (error) {
+                console.error('Connection test failed:', error);
+                testResultDiv.style.display = 'block';
+                testResultDiv.style.background = 'rgba(239, 68, 68, 0.1)';
+                testResultDiv.style.border = '1px solid #ef4444';
+                testResultDiv.style.color = '#ef4444';
+
+                let errorMsg = '❌ Bağlantı başarısız: ' + error.message;
+
+                if (error.message && error.message.includes('Failed to fetch')) {
+                    errorMsg = '❌ Supabase URL\'e erişilemiyor. URL\'i kontrol edin.';
+                } else if (error.code === 'PGRST116') {
+                    errorMsg = '❌ API Key geçersiz. Anon Key\'i kontrol edin.';
+                } else if (error.message && error.message.includes('relation')) {
+                    errorMsg = '❌ one_time_links tablosu bulunamadı. Migration\'ları çalıştırın.';
+                }
+
+                testResultDiv.innerHTML = errorMsg;
+            } finally {
+                testBtn.disabled = false;
+                testBtn.textContent = '🔍 Bağlantıyı Test Et';
+            }
+        }
+
         async function generateReference() {
             const readingType = document.getElementById('readingType').value;
 
@@ -283,23 +334,40 @@
             try {
                 const token = generateToken();
 
+                console.log('🔄 Creating reference with:', {
+                    link_token: token,
+                    reading_type: readingType
+                });
+
                 const { data, error } = await supabaseClient
                     .from('one_time_links')
                     .insert({
                         link_token: token,
                         reading_type: readingType
-                        // *** DÜZELTME: expires_at: null satırı kaldırıldı ***
                     })
                     .select()
                     .single();
 
                 if (error) {
-                    throw error;
+                    console.error('❌ Database error:', error);
+                    let errorMsg = 'Referans numarası oluşturulamadı: ' + error.message;
+
+                    if (error.message && error.message.includes('expires_at')) {
+                        errorMsg = '⚠️ Veritabanı şeması hatası: expires_at sütunu nullable olmalı. Migration\'ı çalıştırın.';
+                    } else if (error.code === 'PGRST116') {
+                        errorMsg = '⚠️ Supabase bağlantısı başarısız. URL ve Key\'i kontrol edin.';
+                    } else if (error.code === '23505') {
+                        errorMsg = '⚠️ Bu token zaten kullanılıyor. Tekrar deneyin.';
+                    }
+
+                    throw new Error(errorMsg);
                 }
 
+                console.log('✅ Reference created successfully:', data);
                 showSuccess(token, readingType);
             } catch (error) {
-                showError('Referans numarası oluşturulamadı: ' + error.message);
+                console.error('❌ Error:', error);
+                showError(error.message);
             } finally {
                 btn.disabled = false;
                 btn.textContent = '🎯 Referans Numarası Oluştur';
