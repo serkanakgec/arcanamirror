@@ -283,8 +283,8 @@
                     .from('one_time_links')
                     .insert({
                         link_token: token,
-                        reading_type: readingType,
-                        expires_at: null
+                        reading_type: readingType
+                        // *** DÜZELTME: expires_at: null satırı kaldırıldı ***
                     })
                     .select()
                     .single();
