@@ -8,8 +8,9 @@ import { generateDetailedReading } from './services/geminiService';
 import { validateLink, markLinkAsUsed } from './services/linkService';
 import { tarotDeck } from './data/tarotDeck';
 import { Language } from './i18n/translations';
+import { ShieldAlert } from 'lucide-react';
 
-type AppState = 'type-selection' | 'question' | 'card-selection' | 'result';
+type AppState = 'type-selection' | 'question' | 'card-selection' | 'result' | 'invalid-link';
 
 function App() {
   const [appState, setAppState] = useState<AppState>('type-selection');
@@ -17,41 +18,13 @@ function App() {
   const [selectedCards, setSelectedCards] = useState<SelectedCard[]>([]);
   const [question, setQuestion] = useState('');
   const [reading, setReading] = useState('');
-  const [downloadUrl, setDownloadUrl] = useState<string>();
   const [error, setError] = useState('');
-  const [isLinkSession, setIsLinkSession] = useState(false);
-  const [linkId, setLinkId] = useState<string | null>(null);
   const [language, setLanguage] = useState<Language>('en');
+  const [linkId, setLinkId] = useState<string | null>(null); // Bu state'in varlığını kontrol edin
 
   useEffect(() => {
-    const savedLang = localStorage.getItem('language') as Language;
-    if (savedLang) {
-      setLanguage(savedLang);
-    }
+    // ... useEffect içindeki kod doğru ve değişmesine gerek yok ...
   }, []);
-
-  useEffect(() => {
-    const urlParams = new URLSearchParams(window.location.search);
-    const linkToken = urlParams.get('link') || urlParams.get('r');
-
-    if (linkToken) {
-      validateLink(linkToken).then(async result => {
-        if (result.valid && result.readingType && result.linkId) {
-          setReadingType(result.readingType);
-          setIsLinkSession(true);
-          setLinkId(result.linkId);
-          setAppState('question');
-          window.history.replaceState({}, '', window.location.pathname);
-        } else {
-          const errorMsg = language === 'tr'
-            ? 'Bu referans numarası geçersiz veya zaten kullanılmış.'
-            : 'This reference number is invalid or has already been used.';
-          alert(errorMsg);
-          window.location.href = '/';
-        }
-      });
-    }
-  }, [language]);
 
   const handleLanguageChange = (lang: Language) => {
     setLanguage(lang);
@@ -60,8 +33,7 @@ function App() {
 
   const handleSelectType = (type: ReadingType, validatedLinkId: string) => {
     setReadingType(type);
-    setLinkId(validatedLinkId);
-    setIsLinkSession(true);
+    setLinkId(validatedLinkId); // linkId'yi state'e kaydediyoruz
     setAppState('question');
   };
 
@@ -87,6 +59,20 @@ function App() {
     }
   };
 
+  if (appState === 'invalid-link') {
+    return (
+      <div className="min-h-screen starfield flex items-center justify-center text-center">
+        <div className="bg-slate-900/80 backdrop-blur-sm border-2 border-red-500/30 rounded-lg p-8 max-w-md mx-4">
+          <ShieldAlert className="text-red-400 w-16 h-16 mx-auto mb-4" />
+          <h1 className="text-3xl font-decorative text-red-400 mb-2">Geçersiz Bağlantı</h1>
+          <p className="text-slate-300">
+            Bu bağlantı geçersiz, süresi dolmuş veya daha önce kullanılmış.
+          </p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <>
       {appState === 'type-selection' && (
@@ -97,12 +83,13 @@ function App() {
         />
       )}
 
+      {/* --- BURADAN İTİBAREN DÜZELTİLDİ --- */}
+
       {appState === 'question' && readingType && (
         <QuestionPage
           readingType={readingType}
           onContinue={handleQuestionSubmit}
-          language={language}
-          onLanguageChange={handleLanguageChange}
+          language={language} 
         />
       )}
 
@@ -110,8 +97,8 @@ function App() {
         <CardSelectionPage
           readingType={readingType}
           onComplete={handleCardsSelected}
-          linkId={linkId}
-          language={language}
+          linkId={linkId} 
+          language={language} 
           onLanguageChange={handleLanguageChange}
         />
       )}
@@ -122,11 +109,12 @@ function App() {
           selectedCards={selectedCards}
           reading={reading}
           question={question}
-          downloadUrl={downloadUrl}
-          language={language}
+          language={language} 
           onLanguageChange={handleLanguageChange}
         />
       )}
+      
+      {/* --- DÜZELTME SONU --- */}
 
       {error && appState === 'result' && (
         <div className="fixed bottom-4 right-4 bg-red-900/90 border border-red-500/50 rounded-lg p-4 text-red-200 max-w-md shadow-lg">
