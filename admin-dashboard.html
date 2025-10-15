@@ -1,0 +1,671 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sylvica Admin Dashboard</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .login-container {
+            max-width: 400px;
+            margin: 100px auto;
+            background: white;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+        }
+
+        .login-container h1 {
+            text-align: center;
+            color: #667eea;
+            margin-bottom: 30px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #333;
+            font-weight: 600;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+        }
+
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .error {
+            color: #e74c3c;
+            text-align: center;
+            margin-top: 15px;
+            font-size: 14px;
+        }
+
+        .dashboard {
+            display: none;
+        }
+
+        .dashboard.active {
+            display: block;
+        }
+
+        .header {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        .header h1 {
+            color: #667eea;
+        }
+
+        .logout-btn {
+            padding: 10px 20px;
+            background: #e74c3c;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .tab {
+            padding: 12px 24px;
+            background: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .tab.active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .content-section {
+            display: none;
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        .content-section.active {
+            display: block;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        th {
+            background: #f8f9fa;
+            font-weight: 600;
+            color: #667eea;
+        }
+
+        tr:hover {
+            background: #f8f9fa;
+        }
+
+        .action-btn {
+            padding: 6px 12px;
+            margin-right: 5px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .delete-btn {
+            background: #e74c3c;
+            color: white;
+        }
+
+        .view-btn {
+            background: #3498db;
+            color: white;
+        }
+
+        .edit-btn {
+            background: #f39c12;
+            color: white;
+        }
+
+        .badge {
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .badge-master {
+            background: #ffd700;
+            color: #333;
+        }
+
+        .badge-single {
+            background: #3498db;
+            color: white;
+        }
+
+        .badge-used {
+            background: #e74c3c;
+            color: white;
+        }
+
+        .badge-active {
+            background: #2ecc71;
+            color: white;
+        }
+
+        .badge-consultation {
+            background: #9b59b6;
+            color: white;
+        }
+
+        .badge-normal {
+            background: #95a5a6;
+            color: white;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            max-width: 800px;
+            max-height: 80vh;
+            overflow-y: auto;
+            width: 90%;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .modal-header h2 {
+            color: #667eea;
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: #999;
+        }
+
+        .close-btn:hover {
+            color: #333;
+        }
+
+        .reading-content {
+            white-space: pre-wrap;
+            line-height: 1.6;
+            color: #333;
+        }
+
+        .info-group {
+            margin-bottom: 15px;
+        }
+
+        .info-group label {
+            font-weight: 600;
+            color: #667eea;
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        .info-group p {
+            color: #333;
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        .stat-card h3 {
+            font-size: 14px;
+            opacity: 0.9;
+            margin-bottom: 10px;
+        }
+
+        .stat-card .number {
+            font-size: 32px;
+            font-weight: 700;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #667eea;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Login Screen -->
+        <div id="loginScreen" class="login-container">
+            <h1>🔮 Sylvica Admin</h1>
+            <form id="loginForm">
+                <div class="form-group">
+                    <label>Kullanıcı Adı</label>
+                    <input type="text" id="username" required>
+                </div>
+                <div class="form-group">
+                    <label>Şifre</label>
+                    <input type="password" id="password" required>
+                </div>
+                <button type="submit" class="btn">Giriş Yap</button>
+                <div id="loginError" class="error"></div>
+            </form>
+        </div>
+
+        <!-- Dashboard -->
+        <div id="dashboard" class="dashboard">
+            <div class="header">
+                <h1>🔮 Sylvica Admin Dashboard</h1>
+                <button class="logout-btn" onclick="logout()">Çıkış Yap</button>
+            </div>
+
+            <div class="stats" id="stats"></div>
+
+            <div class="tabs">
+                <button class="tab active" onclick="switchTab('codes')">📝 Referans Kodları</button>
+                <button class="tab" onclick="switchTab('consultations')">👥 Danışmanlıklar</button>
+            </div>
+
+            <div id="codesSection" class="content-section active">
+                <div class="loading">Yükleniyor...</div>
+            </div>
+
+            <div id="consultationsSection" class="content-section">
+                <div class="loading">Yükleniyor...</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal for viewing consultation details -->
+    <div id="consultationModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Danışmanlık Detayları</h2>
+                <button class="close-btn" onclick="closeModal()">&times;</button>
+            </div>
+            <div id="modalContent"></div>
+        </div>
+    </div>
+
+    <script>
+        const ADMIN_USERNAME = 'akgec';
+        const ADMIN_PASSWORD = 'akgec';
+
+        let supabaseClient = null;
+        const SUPABASE_URL = 'https://gvytaocvehfkhtxtjswz.supabase.co';
+        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imd2eXRhb2N2ZWhma2h0eHRqc3d6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjA0NDA0MTAsImV4cCI6MjA3NjAxNjQxMH0.t70bj-SYzVKj0-NF3Pfie6cVPvpM0-SNeZIjxSZEyLQ';
+
+        function initSupabase() {
+            if (!supabaseClient) {
+                supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+            }
+            return supabaseClient;
+        }
+
+        document.getElementById('loginForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+
+            if (username === ADMIN_USERNAME && password === ADMIN_PASSWORD) {
+                sessionStorage.setItem('adminLoggedIn', 'true');
+                showDashboard();
+            } else {
+                document.getElementById('loginError').textContent = 'Hatalı kullanıcı adı veya şifre!';
+            }
+        });
+
+        function showDashboard() {
+            document.getElementById('loginScreen').style.display = 'none';
+            document.getElementById('dashboard').classList.add('active');
+            initSupabase();
+            loadStats();
+            loadReferenceCodes();
+            loadConsultations();
+        }
+
+        function logout() {
+            sessionStorage.removeItem('adminLoggedIn');
+            document.getElementById('loginScreen').style.display = 'block';
+            document.getElementById('dashboard').classList.remove('active');
+            document.getElementById('username').value = '';
+            document.getElementById('password').value = '';
+            document.getElementById('loginError').textContent = '';
+        }
+
+        function switchTab(tab) {
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.content-section').forEach(s => s.classList.remove('active'));
+
+            event.target.classList.add('active');
+            if (tab === 'codes') {
+                document.getElementById('codesSection').classList.add('active');
+            } else {
+                document.getElementById('consultationsSection').classList.add('active');
+            }
+        }
+
+        async function loadStats() {
+            try {
+                const [codesResult, consultationsResult] = await Promise.all([
+                    supabaseClient.from('one_time_links').select('*', { count: 'exact' }),
+                    supabaseClient.from('consultations').select('*', { count: 'exact' })
+                ]);
+
+                const totalCodes = codesResult.count || 0;
+                const usedCodes = codesResult.data?.filter(c => c.is_used).length || 0;
+                const activeCodes = totalCodes - usedCodes;
+                const totalConsultations = consultationsResult.count || 0;
+
+                document.getElementById('stats').innerHTML = `
+                    <div class="stat-card">
+                        <h3>Toplam Referans Kodu</h3>
+                        <div class="number">${totalCodes}</div>
+                    </div>
+                    <div class="stat-card">
+                        <h3>Aktif Kodlar</h3>
+                        <div class="number">${activeCodes}</div>
+                    </div>
+                    <div class="stat-card">
+                        <h3>Kullanılmış Kodlar</h3>
+                        <div class="number">${usedCodes}</div>
+                    </div>
+                    <div class="stat-card">
+                        <h3>Toplam Danışmanlık</h3>
+                        <div class="number">${totalConsultations}</div>
+                    </div>
+                `;
+            } catch (error) {
+                console.error('Stats error:', error);
+            }
+        }
+
+        async function loadReferenceCodes() {
+            try {
+                const { data, error } = await supabaseClient
+                    .from('one_time_links')
+                    .select('*')
+                    .order('created_at', { ascending: false });
+
+                if (error) throw error;
+
+                const html = `
+                    <h2>Referans Kodları</h2>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Kod</th>
+                                <th>Fal Türü</th>
+                                <th>Tip</th>
+                                <th>Kullanıcı Tipi</th>
+                                <th>Durum</th>
+                                <th>Oluşturulma</th>
+                                <th>İşlemler</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${data.map(code => `
+                                <tr>
+                                    <td><code>${code.link_token}</code></td>
+                                    <td>${code.reading_type}</td>
+                                    <td><span class="badge ${code.is_master ? 'badge-master' : 'badge-single'}">
+                                        ${code.is_master ? '♾️ Sınırsız' : '🎫 Tek Kullanım'}
+                                    </span></td>
+                                    <td><span class="badge ${code.user_type === 'consultation' ? 'badge-consultation' : 'badge-normal'}">
+                                        ${code.user_type === 'consultation' ? '👨‍💼 Danışmanlık' : '👤 Normal'}
+                                    </span></td>
+                                    <td><span class="badge ${code.is_used ? 'badge-used' : 'badge-active'}">
+                                        ${code.is_used ? '❌ Kullanıldı' : '✅ Aktif'}
+                                    </span></td>
+                                    <td>${new Date(code.created_at).toLocaleString('tr-TR')}</td>
+                                    <td>
+                                        <button class="action-btn delete-btn" onclick="deleteCode('${code.id}')">🗑️ Sil</button>
+                                    </td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                `;
+
+                document.getElementById('codesSection').innerHTML = html;
+            } catch (error) {
+                console.error('Load codes error:', error);
+                document.getElementById('codesSection').innerHTML = '<p class="error">Kodlar yüklenemedi!</p>';
+            }
+        }
+
+        async function loadConsultations() {
+            try {
+                const { data, error } = await supabaseClient
+                    .from('consultations')
+                    .select(`
+                        *,
+                        consultation_users (
+                            email,
+                            first_name,
+                            last_name,
+                            birth_date
+                        )
+                    `)
+                    .order('created_at', { ascending: false });
+
+                if (error) throw error;
+
+                const html = `
+                    <h2>Danışmanlıklar</h2>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Tarih</th>
+                                <th>Kullanıcı</th>
+                                <th>Email</th>
+                                <th>Referans Kodu</th>
+                                <th>Fal Türü</th>
+                                <th>İşlemler</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${data.map(consultation => `
+                                <tr>
+                                    <td>${new Date(consultation.created_at).toLocaleString('tr-TR')}</td>
+                                    <td>${consultation.consultation_users?.first_name} ${consultation.consultation_users?.last_name}</td>
+                                    <td>${consultation.consultation_users?.email}</td>
+                                    <td><code>${consultation.reference_code}</code></td>
+                                    <td>${consultation.reading_type}</td>
+                                    <td>
+                                        <button class="action-btn view-btn" onclick='viewConsultation(${JSON.stringify(consultation)})'>👁️ Görüntüle</button>
+                                    </td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                `;
+
+                document.getElementById('consultationsSection').innerHTML = html;
+            } catch (error) {
+                console.error('Load consultations error:', error);
+                document.getElementById('consultationsSection').innerHTML = '<p class="error">Danışmanlıklar yüklenemedi!</p>';
+            }
+        }
+
+        async function deleteCode(id) {
+            if (!confirm('Bu kodu silmek istediğinizden emin misiniz?')) return;
+
+            try {
+                const { error } = await supabaseClient
+                    .from('one_time_links')
+                    .delete()
+                    .eq('id', id);
+
+                if (error) throw error;
+
+                alert('Kod başarıyla silindi!');
+                loadStats();
+                loadReferenceCodes();
+            } catch (error) {
+                console.error('Delete error:', error);
+                alert('Kod silinemedi!');
+            }
+        }
+
+        function viewConsultation(consultation) {
+            const user = consultation.consultation_users;
+            const content = `
+                <div class="info-group">
+                    <label>Kullanıcı Bilgileri</label>
+                    <p><strong>Ad Soyad:</strong> ${user.first_name} ${user.last_name}</p>
+                    <p><strong>Email:</strong> ${user.email}</p>
+                    <p><strong>Doğum Tarihi:</strong> ${new Date(user.birth_date).toLocaleDateString('tr-TR')}</p>
+                </div>
+
+                <div class="info-group">
+                    <label>Fal Bilgileri</label>
+                    <p><strong>Referans Kodu:</strong> ${consultation.reference_code}</p>
+                    <p><strong>Fal Türü:</strong> ${consultation.reading_type}</p>
+                    <p><strong>Tarih:</strong> ${new Date(consultation.created_at).toLocaleString('tr-TR')}</p>
+                </div>
+
+                <div class="info-group">
+                    <label>Soru</label>
+                    <p>${consultation.question}</p>
+                </div>
+
+                <div class="info-group">
+                    <label>Seçilen Kartlar</label>
+                    <p>${JSON.stringify(consultation.selected_cards, null, 2)}</p>
+                </div>
+
+                <div class="info-group">
+                    <label>Fal Sonucu</label>
+                    <div class="reading-content">${consultation.reading_result}</div>
+                </div>
+            `;
+
+            document.getElementById('modalContent').innerHTML = content;
+            document.getElementById('consultationModal').classList.add('active');
+        }
+
+        function closeModal() {
+            document.getElementById('consultationModal').classList.remove('active');
+        }
+
+        if (sessionStorage.getItem('adminLoggedIn') === 'true') {
+            showDashboard();
+        }
+    </script>
+</body>
+</html>
