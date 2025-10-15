@@ -58,8 +58,10 @@ function App() {
     localStorage.setItem('language', lang);
   };
 
-  const handleSelectType = (type: ReadingType) => {
+  const handleSelectType = (type: ReadingType, validatedLinkId: string) => {
     setReadingType(type);
+    setLinkId(validatedLinkId);
+    setIsLinkSession(true);
     setAppState('question');
   };
 
@@ -82,10 +84,6 @@ function App() {
       setError(result.error);
     } else {
       setReading(result.reading);
-
-      if (linkId && isLinkSession) {
-        await markLinkAsUsed(linkId, false);
-      }
     }
   };
 
@@ -112,6 +110,7 @@ function App() {
         <CardSelectionPage
           readingType={readingType}
           onComplete={handleCardsSelected}
+          linkId={linkId}
           language={language}
           onLanguageChange={handleLanguageChange}
         />

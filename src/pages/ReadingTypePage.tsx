@@ -6,7 +6,7 @@ import { LanguageSelector } from '../components/LanguageSelector';
 import { ReferenceModal } from '../components/ReferenceModal';
 
 interface ReadingTypePageProps {
-  onSelectType: (type: ReadingType) => void;
+  onSelectType: (type: ReadingType, linkId: string) => void;
   language: Language;
   onLanguageChange: (lang: Language) => void;
 }
@@ -25,10 +25,10 @@ export function ReadingTypePage({ onSelectType, language, onLanguageChange }: Re
     setIsModalOpen(true);
   };
 
-  const handleModalSuccess = () => {
+  const handleModalSuccess = (linkId: string) => {
     setIsModalOpen(false);
     if (selectedType) {
-      onSelectType(selectedType);
+      onSelectType(selectedType, linkId);
     }
   };
 

@@ -3,10 +3,12 @@ import { ArrowLeft, Sparkles, Loader2 } from 'lucide-react';
 import { tarotDeck } from '../data/tarotDeck';
 import { ReadingType, readingTypes, SelectedCard } from '../types/reading';
 import { Language, getTranslation } from '../i18n/translations';
+import { markLinkAsUsed } from '../services/linkService';
 
 interface CardSelectionPageProps {
   readingType: ReadingType;
   onComplete: (selectedCards: SelectedCard[]) => void;
+  linkId: string | null;
   language: Language;
   onLanguageChange: (lang: Language) => void;
 }
@@ -17,7 +19,7 @@ interface CardPosition {
   y: number;
 }
 
-export function CardSelectionPage({ readingType, onComplete, language }: CardSelectionPageProps) {
+export function CardSelectionPage({ readingType, onComplete, linkId, language }: CardSelectionPageProps) {
   const [selectedCards, setSelectedCards] = useState<SelectedCard[]>([]);
   const [isProcessing, setIsProcessing] = useState(false);
 
@@ -51,8 +53,17 @@ export function CardSelectionPage({ readingType, onComplete, language }: CardSel
     }
   };
 
-  const handleGenerate = () => {
+  const handleGenerate = async () => {
     setIsProcessing(true);
+
+    if (linkId) {
+      try {
+        await markLinkAsUsed(linkId, false);
+      } catch (error) {
+        console.error('Failed to mark link as used:', error);
+      }
+    }
+
     setTimeout(() => {
       onComplete(selectedCards);
     }, 500);
