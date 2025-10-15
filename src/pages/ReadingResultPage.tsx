@@ -4,6 +4,7 @@ import { SelectedCard, ReadingType, readingTypes } from '../types/reading';
 import { tarotDeck } from '../data/tarotDeck';
 import { CardModal } from '../components/CardModal';
 import { TypewriterText } from '../components/TypewriterText';
+import { Language, getTranslation } from '../i18n/translations';
 
 interface ReadingResultPageProps {
   readingType: ReadingType;
@@ -11,6 +12,8 @@ interface ReadingResultPageProps {
   reading: string;
   question: string;
   downloadUrl?: string;
+  language: Language;
+  onLanguageChange: (lang: Language) => void;
 }
 
 export function ReadingResultPage({
@@ -18,12 +21,15 @@ export function ReadingResultPage({
   selectedCards,
   reading,
   question,
-  downloadUrl
+  downloadUrl,
+  language
 }: ReadingResultPageProps) {
   const [selectedCardForModal, setSelectedCardForModal] = useState<string | null>(null);
   const [isDownloading, setIsDownloading] = useState(false);
 
   const config = readingTypes.find(t => t.id === readingType)!;
+
+  const t = (key: Parameters<typeof getTranslation>[1]) => getTranslation(language, key);
 
   const getCardData = (cardId: string) => {
     return tarotDeck.find(c => c.id === cardId);
@@ -100,13 +106,13 @@ Remember: You shape your own destiny.
           <h1 className="text-4xl md:text-5xl font-decorative text-amber-400 glow-text mb-2">
             {config.name}
           </h1>
-          <p className="text-slate-300">Your reading is ready</p>
+          <p className="text-slate-300">{t('readingReady')}</p>
         </header>
 
         <div className="max-w-6xl mx-auto space-y-12">
           <div>
             <h2 className="text-2xl font-decorative text-amber-400 text-center mb-6">
-              Selected Cards
+              {t('selectedCards')}
             </h2>
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6 justify-items-center">
               {selectedCards.map((sc) => {
@@ -135,7 +141,7 @@ Remember: You shape your own destiny.
                       {card.name}
                     </p>
                     {sc.orientation === 'reversed' && (
-                      <p className="text-slate-400 text-xs text-center">(Reversed)</p>
+                      <p className="text-slate-400 text-xs text-center">({t('reversed')})</p>
                     )}
                   </button>
                 );
@@ -146,7 +152,7 @@ Remember: You shape your own destiny.
           {reading ? (
             <div className="bg-gradient-to-br from-slate-900/80 via-purple-900/20 to-slate-900/80 backdrop-blur-sm border-2 border-amber-500/30 rounded-lg p-8 glow-border animate-fade-in">
               <h2 className="text-3xl font-decorative text-amber-400 mb-6 text-center">
-                Your Detailed Reading
+                {t('yourReading')}
               </h2>
               <div className="prose prose-invert prose-amber max-w-none">
                 <div className="text-slate-300 leading-relaxed text-lg">
@@ -163,12 +169,12 @@ Remember: You shape your own destiny.
                   {isDownloading ? (
                     <>
                       <Loader2 className="animate-spin" size={20} />
-                      Preparing...
+                      {t('preparing')}
                     </>
                   ) : (
                     <>
                       <Download size={20} />
-                      Download Reading
+                      {t('downloadReading')}
                     </>
                   )}
                 </button>
@@ -178,7 +184,7 @@ Remember: You shape your own destiny.
             <div className="flex items-center justify-center py-12">
               <div className="flex items-center gap-3 text-slate-300">
                 <Loader2 className="animate-spin" size={32} />
-                <span className="text-xl">Channeling cosmic wisdom...</span>
+                <span className="text-xl">{t('channeling')}</span>
               </div>
             </div>
           )}

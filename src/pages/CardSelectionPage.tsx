@@ -2,10 +2,13 @@ import { useState, useEffect, useMemo } from 'react';
 import { ArrowLeft, Sparkles, Loader2 } from 'lucide-react';
 import { tarotDeck } from '../data/tarotDeck';
 import { ReadingType, readingTypes, SelectedCard } from '../types/reading';
+import { Language, getTranslation } from '../i18n/translations';
 
 interface CardSelectionPageProps {
   readingType: ReadingType;
   onComplete: (selectedCards: SelectedCard[]) => void;
+  language: Language;
+  onLanguageChange: (lang: Language) => void;
 }
 
 interface CardPosition {
@@ -14,13 +17,15 @@ interface CardPosition {
   y: number;
 }
 
-export function CardSelectionPage({ readingType, onComplete }: CardSelectionPageProps) {
+export function CardSelectionPage({ readingType, onComplete, language }: CardSelectionPageProps) {
   const [selectedCards, setSelectedCards] = useState<SelectedCard[]>([]);
   const [isProcessing, setIsProcessing] = useState(false);
 
   const config = readingTypes.find(t => t.id === readingType)!;
   const requiredCount = config.cardCount;
   const isComplete = selectedCards.length === requiredCount;
+
+  const t = (key: Parameters<typeof getTranslation>[1]) => getTranslation(language, key);
 
   const shuffledDeck = useMemo(() => {
     return [...tarotDeck].sort(() => Math.random() - 0.5);
@@ -81,10 +86,10 @@ export function CardSelectionPage({ readingType, onComplete }: CardSelectionPage
 
         <div className="text-center mb-8">
           <p className="text-slate-300 text-lg">
-            Trust your intuition and select {requiredCount} {requiredCount === 1 ? 'card' : 'cards'}
+            {t('trustIntuition')} {requiredCount} {requiredCount === 1 ? t('card') : t('cards')}
           </p>
           <p className="text-slate-400 text-sm mt-2">
-            Click a card to reveal it - once selected, it cannot be deselected
+            {t('clickToReveal')}
           </p>
         </div>
 
@@ -137,7 +142,7 @@ export function CardSelectionPage({ readingType, onComplete }: CardSelectionPage
                         {card.name}
                       </p>
                       {selectedCard.orientation === 'reversed' && (
-                        <p className="text-amber-400/70 text-xs text-center">(Reversed)</p>
+                        <p className="text-amber-400/70 text-xs text-center">({t('reversed')})</p>
                       )}
                     </div>
                   </div>
@@ -157,12 +162,12 @@ export function CardSelectionPage({ readingType, onComplete }: CardSelectionPage
               {isProcessing ? (
                 <>
                   <Loader2 className="animate-spin" size={24} />
-                  Processing...
+                  {t('preparing')}
                 </>
               ) : (
                 <>
                   <Sparkles size={24} />
-                  Generate Detailed Reading
+                  {t('generateReading')}
                 </>
               )}
             </button>

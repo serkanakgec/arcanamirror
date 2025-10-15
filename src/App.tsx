@@ -20,6 +20,7 @@ function App() {
   const [downloadUrl, setDownloadUrl] = useState<string>();
   const [error, setError] = useState('');
   const [isLinkSession, setIsLinkSession] = useState(false);
+  const [linkId, setLinkId] = useState<string | null>(null);
   const [language, setLanguage] = useState<Language>('en');
 
   useEffect(() => {
@@ -36,10 +37,9 @@ function App() {
     if (linkToken) {
       validateLink(linkToken).then(async result => {
         if (result.valid && result.readingType && result.linkId) {
-          await markLinkAsUsed(result.linkId, result.isMaster);
-
           setReadingType(result.readingType);
           setIsLinkSession(true);
+          setLinkId(result.linkId);
           setAppState('question');
           window.history.replaceState({}, '', window.location.pathname);
         } else {
@@ -82,6 +82,10 @@ function App() {
       setError(result.error);
     } else {
       setReading(result.reading);
+
+      if (linkId && isLinkSession) {
+        await markLinkAsUsed(linkId, false);
+      }
     }
   };
 

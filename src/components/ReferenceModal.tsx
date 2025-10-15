@@ -199,14 +199,6 @@ export function ReferenceModal({
         return;
       }
 
-      const marked = await markLinkAsUsed(result.linkId, result.isMaster);
-
-      if (!marked) {
-        setError(errorMessages.invalidReference[language]);
-        setIsValidating(false);
-        return;
-      }
-
       setIsValidating(false);
       setReferenceNumber('');
       setError('');

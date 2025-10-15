@@ -100,13 +100,17 @@
             try {
                 const token = generateToken();
 
+                const futureDate = new Date();
+                futureDate.setFullYear(futureDate.getFullYear() + 100);
+
                 const { data, error } = await supabaseClient
                     .from('one_time_links')
                     .insert({
                         link_token: token,
                         reading_type: readingType,
                         is_used: false,
-                        is_master: true // *** SİZİN TESPİTİNİZE GÖRE DÜZELTİLDİ ***
+                        is_master: true,
+                        expires_at: futureDate.toISOString()
                     })
                     .select()
                     .single();
