@@ -193,13 +193,13 @@ export function ReferenceModal({
         return;
       }
 
-      if (result.readingType !== selectedReadingType) {
+      if (!result.isMaster && result.readingType !== selectedReadingType) {
         setError(errorMessages.typeMismatch[language]);
         setIsValidating(false);
         return;
       }
 
-      const marked = await markLinkAsUsed(result.linkId);
+      const marked = await markLinkAsUsed(result.linkId, result.isMaster);
 
       if (!marked) {
         setError(errorMessages.invalidReference[language]);

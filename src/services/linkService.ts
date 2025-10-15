@@ -11,6 +11,7 @@ export interface OneTimeLink {
   link_token: string;
   reading_type: ReadingType;
   is_used: boolean;
+  is_master: boolean;
   created_at: string;
   used_at: string | null;
   expires_at: string | null;
@@ -49,23 +50,36 @@ export async function generateOneTimeLink(readingType: ReadingType): Promise<str
   }
 }
 
-export async function validateLink(token: string): Promise<{ valid: boolean; readingType?: ReadingType; linkId?: string }> {
+export async function validateLink(token: string): Promise<{ valid: boolean; readingType?: ReadingType; linkId?: string; isMaster?: boolean }> {
   try {
     const { data: link, error: fetchError } = await supabase
       .from('one_time_links')
       .select('*')
       .eq('link_token', token)
-      .eq('is_used', false)
       .maybeSingle();
 
     if (fetchError || !link) {
       return { valid: false };
     }
 
+    if (link.is_master) {
+      return {
+        valid: true,
+        readingType: link.reading_type as ReadingType,
+        linkId: link.id,
+        isMaster: true
+      };
+    }
+
+    if (link.is_used) {
+      return { valid: false };
+    }
+
     return {
       valid: true,
       readingType: link.reading_type as ReadingType,
-      linkId: link.id
+      linkId: link.id,
+      isMaster: false
     };
   } catch (error) {
     console.error('Error validating link:', error);
@@ -73,15 +87,20 @@ export async function validateLink(token: string): Promise<{ valid: boolean; rea
   }
 }
 
-export async function markLinkAsUsed(linkId: string): Promise<boolean> {
+export async function markLinkAsUsed(linkId: string, isMaster: boolean = false): Promise<boolean> {
   try {
+    if (isMaster) {
+      return true;
+    }
+
     const { error } = await supabase
       .from('one_time_links')
       .update({
         is_used: true,
         used_at: new Date().toISOString()
       })
-      .eq('id', linkId);
+      .eq('id', linkId)
+      .eq('is_master', false);
 
     if (error) {
       console.error('Error marking link as used:', error);

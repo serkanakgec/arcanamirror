@@ -36,7 +36,7 @@ function App() {
     if (linkToken) {
       validateLink(linkToken).then(async result => {
         if (result.valid && result.readingType && result.linkId) {
-          await markLinkAsUsed(result.linkId);
+          await markLinkAsUsed(result.linkId, result.isMaster);
 
           setReadingType(result.readingType);
           setIsLinkSession(true);
