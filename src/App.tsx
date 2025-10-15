@@ -31,7 +31,7 @@ function App() {
 
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
-    const linkToken = urlParams.get('link');
+    const linkToken = urlParams.get('link') || urlParams.get('r');
 
     if (linkToken) {
       validateLink(linkToken).then(async result => {
@@ -43,12 +43,15 @@ function App() {
           setAppState('question');
           window.history.replaceState({}, '', window.location.pathname);
         } else {
-          alert('This link is invalid or has already been used.');
+          const errorMsg = language === 'tr'
+            ? 'Bu referans numarası geçersiz veya zaten kullanılmış.'
+            : 'This reference number is invalid or has already been used.';
+          alert(errorMsg);
           window.location.href = '/';
         }
       });
     }
-  }, []);
+  }, [language]);
 
   const handleLanguageChange = (lang: Language) => {
     setLanguage(lang);
