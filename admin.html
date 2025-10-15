@@ -57,6 +57,14 @@
             </select>
         </div>
 
+        <div class="form-group">
+            <label for="codeType">Kod Tipi:</label>
+            <select id="codeType">
+                <option value="single">🎫 Tek Kullanımlık (Bir kez kullanılır ve geçersiz olur)</option>
+                <option value="master">♾️ Sınırsız Kullanım (Süresiz kullanılabilir)</option>
+            </select>
+        </div>
+
         <button onclick="generateReference()" id="generateBtn">
             🎯 Referans Numarası Oluştur
         </button>
@@ -90,6 +98,7 @@
 
         async function generateReference() {
             const readingType = document.getElementById('readingType').value;
+            const codeType = document.getElementById('codeType').value;
             if (!readingType) { showError('Lütfen bir fal türü seçin!'); return; }
             if (!initSupabase()) return;
 
@@ -99,6 +108,7 @@
 
             try {
                 const token = generateToken();
+                const isMaster = codeType === 'master';
 
                 const futureDate = new Date();
                 futureDate.setFullYear(futureDate.getFullYear() + 100);
@@ -109,7 +119,7 @@
                         link_token: token,
                         reading_type: readingType,
                         is_used: false,
-                        is_master: true,
+                        is_master: isMaster,
                         expires_at: futureDate.toISOString()
                     })
                     .select()
@@ -117,7 +127,7 @@
 
                 if (error) throw error;
 
-                showSuccess(token, readingType);
+                showSuccess(token, readingType, isMaster);
             } catch (error) {
                 showError('Referans numarası oluşturulamadı: ' + error.message);
             } finally {
@@ -127,12 +137,13 @@
         }
         
         // Diğer yardımcı fonksiyonlar...
-        function showSuccess(token, readingType) {
+        function showSuccess(token, readingType, isMaster) {
             const resultDiv = document.getElementById('result');
             resultDiv.style.background = 'rgba(16, 185, 129, 0.1)';
             resultDiv.style.borderColor = '#10b981';
             document.getElementById('resultTitle').textContent = '✅ Başarıyla Oluşturuldu! (Kopyalamak için koda tıklayın)';
-            document.getElementById('resultMessage').textContent = `Fal Türü: ${getReadingTypeName(readingType)}`;
+            const codeTypeText = isMaster ? '♾️ Sınırsız Kullanım' : '🎫 Tek Kullanımlık';
+            document.getElementById('resultMessage').textContent = `Fal Türü: ${getReadingTypeName(readingType)} | Tip: ${codeTypeText}`;
             document.getElementById('resultCode').textContent = token;
             resultDiv.style.display = 'block';
         }
