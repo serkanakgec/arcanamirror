@@ -5,7 +5,7 @@ import { QuestionPage } from './pages/QuestionPage';
 import { CardSelectionPage } from './pages/CardSelectionPage';
 import { ReadingResultPage } from './pages/ReadingResultPage';
 import { generateDetailedReading } from './services/geminiService';
-import { validateLink, markLinkAsUsed } from './services/linkService';
+import { markLinkAsUsed } from './services/linkService';
 import { tarotDeck } from './data/tarotDeck';
 import { Language } from './i18n/translations';
 import { ShieldAlert } from 'lucide-react';
@@ -50,6 +50,14 @@ function App() {
 
     if (!readingType) return;
 
+    if (linkId) {
+      try {
+        await markLinkAsUsed(linkId, false);
+      } catch (error) {
+        console.error('Failed to mark link as used:', error);
+      }
+    }
+
     const result = await generateDetailedReading(readingType, cards, tarotDeck, question, language);
 
     if (result.error) {
@@ -89,7 +97,8 @@ function App() {
         <QuestionPage
           readingType={readingType}
           onContinue={handleQuestionSubmit}
-          language={language} 
+          language={language}
+          onLanguageChange={handleLanguageChange}
         />
       )}
 
@@ -97,8 +106,7 @@ function App() {
         <CardSelectionPage
           readingType={readingType}
           onComplete={handleCardsSelected}
-          linkId={linkId} 
-          language={language} 
+          language={language}
           onLanguageChange={handleLanguageChange}
         />
       )}
