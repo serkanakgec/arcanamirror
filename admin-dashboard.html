@@ -345,6 +345,102 @@
             padding: 40px;
             color: #667eea;
         }
+
+        .create-code-section {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        .create-code-section h3 {
+            color: #667eea;
+            margin-bottom: 15px;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr auto;
+            gap: 15px;
+            align-items: end;
+        }
+
+        .form-field {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .form-field label {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+
+        .form-field select {
+            padding: 10px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: all 0.3s;
+            background: white;
+        }
+
+        .form-field select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .create-btn {
+            padding: 12px 24px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: transform 0.2s;
+        }
+
+        .create-btn:hover {
+            transform: translateY(-2px);
+        }
+
+        .create-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .success-message {
+            background: #d4edda;
+            color: #155724;
+            padding: 12px;
+            border-radius: 8px;
+            margin-top: 15px;
+            display: none;
+        }
+
+        .success-message.show {
+            display: block;
+        }
+
+        .download-btn {
+            background: #27ae60;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            margin-top: 15px;
+            display: block;
+            width: 100%;
+        }
+
+        .download-btn:hover {
+            background: #229954;
+        }
     </style>
 </head>
 <body>
@@ -381,6 +477,36 @@
             </div>
 
             <div id="codesSection" class="content-section active">
+                <div class="create-code-section">
+                    <h3>➕ Yeni Referans Kodu Oluştur</h3>
+                    <div class="form-row">
+                        <div class="form-field">
+                            <label>Fal Türü</label>
+                            <select id="readingType">
+                                <option value="daily">Daily Reading (1 Card)</option>
+                                <option value="3-card">3-Card Reading</option>
+                                <option value="5-card">5-Card Reading</option>
+                                <option value="celtic">Celtic Cross (10 Cards)</option>
+                            </select>
+                        </div>
+                        <div class="form-field">
+                            <label>Kullanıcı Tipi</label>
+                            <select id="userType">
+                                <option value="normal">Normal</option>
+                                <option value="consultation">Danışmanlık</option>
+                            </select>
+                        </div>
+                        <div class="form-field">
+                            <label>Kod Tipi</label>
+                            <select id="codeType">
+                                <option value="single">Tek Kullanım</option>
+                                <option value="master">Sınırsız</option>
+                            </select>
+                        </div>
+                        <button class="create-btn" onclick="createReferenceCode()">Oluştur</button>
+                    </div>
+                    <div id="successMessage" class="success-message"></div>
+                </div>
                 <div class="loading">Yükleniyor...</div>
             </div>
 
@@ -602,6 +728,51 @@
             }
         }
 
+        async function createReferenceCode() {
+            const readingType = document.getElementById('readingType').value;
+            const userType = document.getElementById('userType').value;
+            const codeType = document.getElementById('codeType').value;
+            const isMaster = codeType === 'master';
+
+            const button = event.target;
+            button.disabled = true;
+            button.textContent = 'Oluşturuluyor...';
+
+            try {
+                const linkToken = 'CODE-' + Math.random().toString(36).substring(2, 15).toUpperCase();
+
+                const { data, error } = await supabaseClient
+                    .from('one_time_links')
+                    .insert([{
+                        link_token: linkToken,
+                        reading_type: readingType,
+                        is_master: isMaster,
+                        user_type: userType,
+                        is_used: false
+                    }])
+                    .select();
+
+                if (error) throw error;
+
+                const successMsg = document.getElementById('successMessage');
+                successMsg.innerHTML = `✅ Referans kodu başarıyla oluşturuldu: <strong>${linkToken}</strong>`;
+                successMsg.classList.add('show');
+
+                setTimeout(() => {
+                    successMsg.classList.remove('show');
+                }, 5000);
+
+                loadStats();
+                loadReferenceCodes();
+            } catch (error) {
+                console.error('Create code error:', error);
+                alert('Kod oluşturulamadı: ' + error.message);
+            } finally {
+                button.disabled = false;
+                button.textContent = 'Oluştur';
+            }
+        }
+
         async function deleteCode(id) {
             if (!confirm('Bu kodu silmek istediğinizden emin misiniz?')) return;
 
@@ -653,10 +824,69 @@
                     <label>Fal Sonucu</label>
                     <div class="reading-content">${consultation.reading_result}</div>
                 </div>
+
+                <button class="download-btn" onclick='downloadConsultation(${JSON.stringify(consultation).replace(/'/g, "&#39;")})'>
+                    📥 Okumayı İndir (.txt)
+                </button>
             `;
 
             document.getElementById('modalContent').innerHTML = content;
             document.getElementById('consultationModal').classList.add('active');
+        }
+
+        function downloadConsultation(consultation) {
+            const user = consultation.consultation_users;
+            const date = new Date(consultation.created_at);
+            const dateStr = date.toLocaleDateString('tr-TR').replace(/\./g, '-');
+            const fileName = `sylvica-danismanlik-${user.first_name}_${user.last_name}-${dateStr}.txt`;
+
+            const cardsList = consultation.selected_cards.map((card, idx) =>
+                `  ${idx + 1}. ${card.cardName || 'Kart ' + card.cardId} (Pozisyon: ${card.position})`
+            ).join('\n');
+
+            const content = `
+═══════════════════════════════════════════════════════════
+                    SYLVICA TAROT DANIŞMANLIĞI
+═══════════════════════════════════════════════════════════
+
+KULLANICI BİLGİLERİ:
+─────────────────────────────────────────────────────────
+Ad Soyad       : ${user.first_name} ${user.last_name}
+E-posta        : ${user.email}
+Doğum Tarihi   : ${new Date(user.birth_date).toLocaleDateString('tr-TR')}
+
+FAL BİLGİLERİ:
+─────────────────────────────────────────────────────────
+Referans Kodu  : ${consultation.reference_code}
+Fal Türü       : ${consultation.reading_type}
+Tarih          : ${date.toLocaleString('tr-TR')}
+
+SORU:
+─────────────────────────────────────────────────────────
+${consultation.question}
+
+SEÇİLEN KARTLAR:
+─────────────────────────────────────────────────────────
+${cardsList}
+
+FAL SONUCU:
+─────────────────────────────────────────────────────────
+${consultation.reading_result}
+
+═══════════════════════════════════════════════════════════
+                    © 2025 Sylvica Tarot
+═══════════════════════════════════════════════════════════
+            `.trim();
+
+            const blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = fileName;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
         }
 
         function closeModal() {
