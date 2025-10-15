@@ -100,19 +100,13 @@
             try {
                 const token = generateToken();
                 
-                // *** KESİN ÇÖZÜM KODU BAŞLANGICI ***
-                // Gelecekte bir tarih oluştur (100 yıl sonrası)
-                const futureDate = new Date();
-                futureDate.setFullYear(futureDate.getFullYear() + 100);
-                // *** KESİN ÇÖZÜM KODU SONU ***
-
                 const { data, error } = await supabaseClient
                     .from('one_time_links')
                     .insert({
                         link_token: token,
                         reading_type: readingType,
-                        is_used: false, // Hem bu...
-                        expires_at: futureDate.toISOString() // ...hem de bu alanın dolu olması gerekiyor.
+                        is_used: false,
+                        is_master: false // *** KESİN ÇÖZÜM: Bu satır eklendi ***
                     })
                     .select()
                     .single();
@@ -128,7 +122,6 @@
             }
         }
         
-        // Diğer yardımcı fonksiyonlar (showSuccess, showError, vb.)
         function showSuccess(token, readingType) {
             const resultDiv = document.getElementById('result');
             resultDiv.style.background = 'rgba(16, 185, 129, 0.1)';
