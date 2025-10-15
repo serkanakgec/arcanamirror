@@ -84,34 +84,33 @@ function App() {
       }
     }
 
-    const result = await generateDetailedReading(readingType, cards, tarotDeck, question, language);
-
-    if (result.error) {
-      setError(result.error);
-      setAppState('result');
-      return;
-    }
-
-    setReading(result.reading);
-
     if (userType === 'consultation' && consultationUserId && referenceCode) {
-      const saved = await saveConsultation({
-        userId: consultationUserId,
-        referenceCode,
-        readingType,
-        question,
-        selectedCards: cards,
-        readingResult: result.reading
-      });
+      setAppState('consultation-success');
 
-      if (saved) {
-        setAppState('consultation-success');
-      } else {
-        setError('Failed to save consultation');
-        setAppState('result');
-      }
+      (async () => {
+        const result = await generateDetailedReading(readingType, cards, tarotDeck, question, language);
+
+        if (result.reading) {
+          await saveConsultation({
+            userId: consultationUserId,
+            referenceCode,
+            readingType,
+            question,
+            selectedCards: cards,
+            readingResult: result.reading
+          });
+        }
+      })();
     } else {
       setAppState('result');
+
+      const result = await generateDetailedReading(readingType, cards, tarotDeck, question, language);
+
+      if (result.error) {
+        setError(result.error);
+      } else {
+        setReading(result.reading);
+      }
     }
   };
 
@@ -134,12 +133,17 @@ function App() {
       <div className="min-h-screen starfield flex items-center justify-center text-center">
         <div className="bg-slate-900/80 backdrop-blur-sm border-2 border-green-500/30 rounded-lg p-8 max-w-md mx-4">
           <CheckCircle className="text-green-400 w-16 h-16 mx-auto mb-4" />
-          <h1 className="text-3xl font-decorative text-green-400 mb-2">Consultation Submitted</h1>
+          <h1 className="text-3xl font-decorative text-green-400 mb-2">
+            {language === 'tr' ? 'Başvurunuz Alındı' : 'Consultation Submitted'}
+          </h1>
           <p className="text-slate-300 mb-4">
-            Your reading has been submitted successfully. Our team will review it and contact you via email.
+            {language === 'tr'
+              ? 'Tarot falınız oluşturulmaktadır. Sonuçlar gün içerisinde mail adresinize gönderilecektir.'
+              : 'Your tarot reading is being generated. Results will be sent to your email address within the day.'
+            }
           </p>
           <p className="text-slate-400 text-sm">
-            Thank you for using Sylvica.
+            {language === 'tr' ? 'Sylvica kullandığınız için teşekkür ederiz.' : 'Thank you for using Sylvica.'}
           </p>
         </div>
       </div>
