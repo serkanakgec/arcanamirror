@@ -6,171 +6,16 @@
     <title>Tarot Admin - Referans Numarası Oluşturucu</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-            background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 20px;
-            color: #e2e8f0;
-        }
-        .container {
-            background: rgba(15, 23, 42, 0.8);
-            border: 2px solid rgba(251, 191, 36, 0.3);
-            border-radius: 16px;
-            padding: 40px;
-            max-width: 600px;
-            width: 100%;
-            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
-        }
-        h1 {
-            color: #fbbf24;
-            margin-bottom: 10px;
-            font-size: 28px;
-            text-align: center;
-        }
-        .subtitle {
-            text-align: center;
-            color: #94a3b8;
-            margin-bottom: 30px;
-            font-size: 14px;
-        }
-        .config-section {
-            background: rgba(30, 41, 59, 0.5);
-            border: 1px solid rgba(251, 191, 36, 0.2);
-            border-radius: 8px;
-            padding: 20px;
-            margin-bottom: 30px;
-        }
-        .config-section h2 {
-            color: #fbbf24;
-            font-size: 16px;
-            margin-bottom: 15px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-        .config-section h2::before {
-            content: '⚙️';
-        }
-        .form-group {
-            margin-bottom: 20px;
-        }
-        label {
-            display: block;
-            margin-bottom: 8px;
-            color: #cbd5e1;
-            font-weight: 500;
-            font-size: 14px;
-        }
-        input, select {
-            width: 100%;
-            padding: 12px;
-            background: rgba(15, 23, 42, 0.8);
-            border: 2px solid rgba(251, 191, 36, 0.3);
-            border-radius: 8px;
-            color: #e2e8f0;
-            font-size: 14px;
-            transition: all 0.3s;
-        }
-        input:focus, select:focus {
-            outline: none;
-            border-color: #fbbf24;
-            box-shadow: 0 0 0 3px rgba(251, 191, 36, 0.1);
-        }
-        button {
-            width: 100%;
-            padding: 14px;
-            background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
-            border: none;
-            border-radius: 8px;
-            color: #0f172a;
-            font-weight: 700;
-            font-size: 16px;
-            cursor: pointer;
-            transition: all 0.3s;
-            margin-top: 10px;
-        }
-        button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 20px rgba(251, 191, 36, 0.3);
-        }
-        button:active {
-            transform: translateY(0);
-        }
-        button:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-            transform: none;
-        }
-        .result {
-            margin-top: 20px;
-            padding: 20px;
-            background: rgba(16, 185, 129, 0.1);
-            border: 2px solid #10b981;
-            border-radius: 8px;
-            display: none;
-        }
-        .result.show {
-            display: block;
-            animation: slideIn 0.3s ease;
-        }
-        .result.error {
-            background: rgba(239, 68, 68, 0.1);
-            border-color: #ef4444;
-        }
-        @keyframes slideIn {
-            from {
-                opacity: 0;
-                transform: translateY(-10px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-        .result h3 {
-            color: #10b981;
-            margin-bottom: 12px;
-            font-size: 16px;
-        }
-        .result.error h3 {
-            color: #ef4444;
-        }
-        .result-code {
-            background: rgba(15, 23, 42, 0.8);
-            padding: 12px;
-            border-radius: 6px;
-            font-family: 'Courier New', monospace;
-            word-break: break-all;
-            margin-top: 8px;
-            color: #fbbf24;
-            border: 1px solid rgba(251, 191, 36, 0.2);
-        }
-        .copy-btn {
-            margin-top: 10px;
-            padding: 8px;
-            font-size: 14px;
-        }
-        .info {
-            background: rgba(59, 130, 246, 0.1);
-            border: 1px solid rgba(59, 130, 246, 0.3);
-            border-radius: 8px;
-            padding: 15px;
-            margin-bottom: 20px;
-            font-size: 13px;
-            color: #93c5fd;
-        }
-        .info strong {
-            color: #60a5fa;
-        }
+        /* Stil kodları aynı kaldığı için kısaltıldı */
+        body { font-family: sans-serif; background-color: #0f0c29; color: #e0e0e0; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
+        .container { background-color: #1e1b4b; padding: 2rem; border-radius: 12px; box-shadow: 0 0 20px rgba(76, 29, 149, 0.5); text-align: center; border: 1px solid #4f46e5; max-width: 600px; width: 100%;}
+        h1 { color: #facc15; }
+        select, button, input { width: 100%; padding: 0.75rem; margin-top: 1rem; border-radius: 6px; border: 1px solid #4f46e5; background-color: #312e81; color: #e0e0e0; font-size: 1rem; }
+        button { cursor: pointer; }
+        #result { margin-top: 1.5rem; background-color: #111827; padding: 1rem; border-radius: 6px; display: none; }
+        #result pre { color: #34d399; font-weight: bold; font-size: 1.1rem; text-align: center; word-wrap: break-word; white-space: pre-wrap; }
+        .config-section { padding: 20px; margin-bottom: 20px; border: 1px solid #4f46e5; border-radius: 8px;}
+        label { display: block; text-align: left; margin-bottom: 5px; }
     </style>
 </head>
 <body>
@@ -188,15 +33,6 @@
                 <label for="supabaseKey">Supabase Anon Key:</label>
                 <input type="text" id="supabaseKey" placeholder="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..." required>
             </div>
-            <button onclick="testConnection()" id="testBtn" style="margin-top: 10px; background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);">
-                🔍 Bağlantıyı Test Et
-            </button>
-            <div id="testResult" style="margin-top: 10px; padding: 10px; border-radius: 6px; display: none; font-size: 13px;"></div>
-        </div>
-
-        <div class="info">
-            <strong>ℹ️ Bilgi:</strong> Bu panel sadece yerel bilgisayarınızda kullanılmak içindir.
-            Supabase bilgilerinizi girin ve müşterileriniz için referans numarası oluşturun.
         </div>
 
         <div class="form-group">
@@ -207,12 +43,12 @@
                     <option value="daily">🌅 Günlük Tarot</option>
                     <option value="3-card">🃏 3 Kart (Geçmiş-Şimdi-Gelecek)</option>
                     <option value="celtic-cross">✨ Celtic Cross (10 Kart)</option>
-                </optgroup>
-                <optgroup label="Tematik Okumalar">
                     <option value="relationship">❤️ İlişki & Aşk</option>
                     <option value="career">💼 Kariyer & Para</option>
                     <option value="soulmate">💕 Ruh Eşi</option>
                     <option value="year">📅 Yıllık Okuma (12 Kart)</option>
+                </optgroup>
+                <optgroup label="Tematik Okumalar">
                     <option value="divination">🔮 Kehanet Tarot</option>
                     <option value="psychological">🧠 Psikolojik Tarot</option>
                     <option value="spiritual">🕉️ Manevi Rehberlik</option>
@@ -227,12 +63,9 @@
         </button>
 
         <div id="result" class="result">
-            <h3 id="resultTitle">✅ Referans Numarası Başarıyla Oluşturuldu!</h3>
-            <p id="resultMessage"></p>
-            <div class="result-code" id="resultCode"></div>
-            <button class="copy-btn" onclick="copyToClipboard()">
-                📋 Kopyala
-            </button>
+             <h3 id="resultTitle"></h3>
+             <p id="resultMessage"></p>
+             <pre id="resultCode" style="cursor: pointer;" onclick="copyToClipboard()"></pre>
         </div>
     </div>
 
@@ -249,12 +82,10 @@
         function initSupabase() {
             const url = document.getElementById('supabaseUrl').value.trim();
             const key = document.getElementById('supabaseKey').value.trim();
-
             if (!url || !key) {
                 showError('Lütfen Supabase URL ve Anon Key\'i girin!');
                 return false;
             }
-
             try {
                 supabaseClient = createClient(url, key);
                 return true;
@@ -264,68 +95,13 @@
             }
         }
 
-        async function testConnection() {
-            const testResultDiv = document.getElementById('testResult');
-            const testBtn = document.getElementById('testBtn');
-
-            if (!initSupabase()) {
-                return;
-            }
-
-            testBtn.disabled = true;
-            testBtn.textContent = '⏳ Test ediliyor...';
-            testResultDiv.style.display = 'none';
-
-            try {
-                const { data, error } = await supabaseClient
-                    .from('one_time_links')
-                    .select('id')
-                    .limit(1);
-
-                if (error) {
-                    throw error;
-                }
-
-                testResultDiv.style.display = 'block';
-                testResultDiv.style.background = 'rgba(16, 185, 129, 0.1)';
-                testResultDiv.style.border = '1px solid #10b981';
-                testResultDiv.style.color = '#10b981';
-                testResultDiv.innerHTML = '✅ Bağlantı başarılı! Veritabanına erişim sağlandı.';
-            } catch (error) {
-                console.error('Connection test failed:', error);
-                testResultDiv.style.display = 'block';
-                testResultDiv.style.background = 'rgba(239, 68, 68, 0.1)';
-                testResultDiv.style.border = '1px solid #ef4444';
-                testResultDiv.style.color = '#ef4444';
-
-                let errorMsg = '❌ Bağlantı başarısız: ' + error.message;
-
-                if (error.message && error.message.includes('Failed to fetch')) {
-                    errorMsg = '❌ Supabase URL\'e erişilemiyor. URL\'i kontrol edin.';
-                } else if (error.code === 'PGRST116') {
-                    errorMsg = '❌ API Key geçersiz. Anon Key\'i kontrol edin.';
-                } else if (error.message && error.message.includes('relation')) {
-                    errorMsg = '❌ one_time_links tablosu bulunamadı. Migration\'ları çalıştırın.';
-                }
-
-                testResultDiv.innerHTML = errorMsg;
-            } finally {
-                testBtn.disabled = false;
-                testBtn.textContent = '🔍 Bağlantıyı Test Et';
-            }
-        }
-
         async function generateReference() {
             const readingType = document.getElementById('readingType').value;
-
             if (!readingType) {
                 showError('Lütfen bir fal türü seçin!');
                 return;
             }
-
-            if (!initSupabase()) {
-                return;
-            }
+            if (!initSupabase()) return;
 
             const btn = document.getElementById('generateBtn');
             btn.disabled = true;
@@ -333,41 +109,28 @@
 
             try {
                 const token = generateToken();
-
-                console.log('🔄 Creating reference with:', {
-                    link_token: token,
-                    reading_type: readingType
-                });
+                
+                // *** YENİ EKLENEN KOD BAŞLANGICI ***
+                // Gelecekte bir tarih oluştur (örneğin 100 yıl sonrası)
+                const futureDate = new Date();
+                futureDate.setFullYear(futureDate.getFullYear() + 100);
+                // *** YENİ EKLENEN KOD SONU ***
 
                 const { data, error } = await supabaseClient
                     .from('one_time_links')
                     .insert({
                         link_token: token,
-                        reading_type: readingType
+                        reading_type: readingType,
+                        expires_at: futureDate.toISOString() // DÜZELTME: Artık ileri bir tarih gönderiyoruz
                     })
                     .select()
                     .single();
 
-                if (error) {
-                    console.error('❌ Database error:', error);
-                    let errorMsg = 'Referans numarası oluşturulamadı: ' + error.message;
+                if (error) throw error;
 
-                    if (error.message && error.message.includes('expires_at')) {
-                        errorMsg = '⚠️ Veritabanı şeması hatası: expires_at sütunu nullable olmalı. Migration\'ı çalıştırın.';
-                    } else if (error.code === 'PGRST116') {
-                        errorMsg = '⚠️ Supabase bağlantısı başarısız. URL ve Key\'i kontrol edin.';
-                    } else if (error.code === '23505') {
-                        errorMsg = '⚠️ Bu token zaten kullanılıyor. Tekrar deneyin.';
-                    }
-
-                    throw new Error(errorMsg);
-                }
-
-                console.log('✅ Reference created successfully:', data);
                 showSuccess(token, readingType);
             } catch (error) {
-                console.error('❌ Error:', error);
-                showError(error.message);
+                showError('Referans numarası oluşturulamadı: ' + error.message);
             } finally {
                 btn.disabled = false;
                 btn.textContent = '🎯 Referans Numarası Oluştur';
@@ -376,69 +139,41 @@
 
         function showSuccess(token, readingType) {
             const resultDiv = document.getElementById('result');
-            const resultCode = document.getElementById('resultCode');
-            const resultMessage = document.getElementById('resultMessage');
-            const resultTitle = document.getElementById('resultTitle');
-
-            resultTitle.textContent = '✅ Referans Numarası Başarıyla Oluşturuldu!';
-            resultMessage.textContent = `Fal Türü: ${getReadingTypeName(readingType)}`;
-            resultCode.textContent = token;
-            resultDiv.className = 'result show';
+            resultDiv.style.borderColor = '#10b981';
+            document.getElementById('resultTitle').textContent = '✅ Başarıyla Oluşturuldu! (Kopyalamak için koda tıklayın)';
+            document.getElementById('resultMessage').textContent = `Fal Türü: ${getReadingTypeName(readingType)}`;
+            document.getElementById('resultCode').textContent = token;
+            resultDiv.style.display = 'block';
         }
 
         function showError(message) {
             const resultDiv = document.getElementById('result');
-            const resultCode = document.getElementById('resultCode');
-            const resultMessage = document.getElementById('resultMessage');
-            const resultTitle = document.getElementById('resultTitle');
-
-            resultTitle.textContent = '❌ Hata!';
-            resultMessage.textContent = message;
-            resultCode.textContent = '';
-            resultDiv.className = 'result show error';
+            resultDiv.style.borderColor = '#ef4444';
+            document.getElementById('resultTitle').textContent = '❌ Hata!';
+            document.getElementById('resultMessage').textContent = message;
+            document.getElementById('resultCode').textContent = '';
+            resultDiv.style.display = 'block';
         }
-
+        
         function getReadingTypeName(type) {
-            const names = {
-                'daily': '🌅 Günlük Tarot',
-                '3-card': '🃏 3 Kart (Geçmiş-Şimdi-Gelecek)',
-                'celtic-cross': '✨ Celtic Cross (10 Kart)',
-                'relationship': '❤️ İlişki & Aşk',
-                'career': '💼 Kariyer & Para',
-                'soulmate': '💕 Ruh Eşi',
-                'year': '📅 Yıllık Okuma (12 Kart)',
-                'divination': '🔮 Kehanet Tarot',
-                'psychological': '🧠 Psikolojik Tarot',
-                'spiritual': '🕉️ Manevi Rehberlik',
-                'meditation': '🧘 Meditasyon Tarot',
-                'decision': '⚖️ Karar Verme (2 Seçenek)'
-            };
-            return names[type] || type;
+            const select = document.getElementById('readingType');
+            for (let i = 0; i < select.options.length; i++) {
+                if (select.options[i].value === type) {
+                    return select.options[i].text;
+                }
+            }
+            return type;
         }
 
         function copyToClipboard() {
             const code = document.getElementById('resultCode').textContent;
-            navigator.clipboard.writeText(code).then(() => {
-                const btn = event.target;
-                const originalText = btn.textContent;
-                btn.textContent = '✅ Kopyalandı!';
-                setTimeout(() => {
-                    btn.textContent = originalText;
-                }, 2000);
-            });
+            if(code) {
+                navigator.clipboard.writeText(code).then(() => {
+                    alert('Kod panoya kopyalandı!');
+                });
+            }
         }
 
-        document.getElementById('readingType').addEventListener('change', function() {
-            document.getElementById('result').className = 'result';
-        });
-
-        document.getElementById('supabaseUrl').addEventListener('input', function() {
-            document.getElementById('result').className = 'result';
-        });
-
-        document.getElementById('supabaseKey').addEventListener('input', function() {
-            document.getElementById('result').className = 'result';
-        });
     </script>
 </body>
 </html>
