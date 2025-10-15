@@ -6,7 +6,6 @@
     <title>Tarot Admin - Referans Numarası Oluşturucu</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
-        /* Stil kodları aynı, bu yüzden kısaltıldı */
         body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif; background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%); min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 20px; color: #e2e8f0; }
         .container { background: rgba(15, 23, 42, 0.8); border: 2px solid rgba(251, 191, 36, 0.3); border-radius: 16px; padding: 40px; max-width: 600px; width: 100%; box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5); }
         h1 { color: #fbbf24; margin-bottom: 10px; font-size: 28px; text-align: center; }
@@ -82,27 +81,16 @@
         function initSupabase() {
             const url = document.getElementById('supabaseUrl').value.trim();
             const key = document.getElementById('supabaseKey').value.trim();
-            if (!url || !key) {
-                showError('Lütfen Supabase URL ve Anon Key\'i girin!');
-                return false;
-            }
+            if (!url || !key) { showError('Lütfen Supabase URL ve Anon Key\'i girin!'); return false; }
             try {
-                if (!supabaseClient) {
-                    supabaseClient = createClient(url, key);
-                }
+                if (!supabaseClient) { supabaseClient = createClient(url, key); }
                 return true;
-            } catch (error) {
-                showError('Supabase bağlantısı başarısız: ' + error.message);
-                return false;
-            }
+            } catch (error) { showError('Supabase bağlantısı başarısız: ' + error.message); return false; }
         }
 
         async function generateReference() {
             const readingType = document.getElementById('readingType').value;
-            if (!readingType) {
-                showError('Lütfen bir fal türü seçin!');
-                return;
-            }
+            if (!readingType) { showError('Lütfen bir fal türü seçin!'); return; }
             if (!initSupabase()) return;
 
             const btn = document.getElementById('generateBtn');
@@ -111,13 +99,20 @@
 
             try {
                 const token = generateToken();
+                
+                // *** KESİN ÇÖZÜM KODU BAŞLANGICI ***
+                // Gelecekte bir tarih oluştur (100 yıl sonrası)
+                const futureDate = new Date();
+                futureDate.setFullYear(futureDate.getFullYear() + 100);
+                // *** KESİN ÇÖZÜM KODU SONU ***
 
                 const { data, error } = await supabaseClient
                     .from('one_time_links')
                     .insert({
                         link_token: token,
                         reading_type: readingType,
-                        is_used: false // *** KESİN DÜZELTME: Bu satır eklendi ***
+                        is_used: false, // Hem bu...
+                        expires_at: futureDate.toISOString() // ...hem de bu alanın dolu olması gerekiyor.
                     })
                     .select()
                     .single();
@@ -133,6 +128,7 @@
             }
         }
         
+        // Diğer yardımcı fonksiyonlar (showSuccess, showError, vb.)
         function showSuccess(token, readingType) {
             const resultDiv = document.getElementById('result');
             resultDiv.style.background = 'rgba(16, 185, 129, 0.1)';
@@ -156,9 +152,7 @@
         function getReadingTypeName(type) {
             const select = document.getElementById('readingType');
             for (let i = 0; i < select.options.length; i++) {
-                if (select.options[i].value === type) {
-                    return select.options[i].text;
-                }
+                if (select.options[i].value === type) return select.options[i].text;
             }
             return type;
         }
@@ -166,9 +160,7 @@
         function copyToClipboard() {
             const code = document.getElementById('resultCode').textContent;
             if(code) {
-                navigator.clipboard.writeText(code).then(() => {
-                    alert('Kod panoya kopyalandı!');
-                });
+                navigator.clipboard.writeText(code).then(() => { alert('Kod panoya kopyalandı!'); });
             }
         }
     </script>
