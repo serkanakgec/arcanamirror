@@ -99,10 +99,6 @@
 
             try {
                 const token = generateToken();
-                
-                // Gelecekte bir tarih oluştur (100 yıl sonrası)
-                const futureDate = new Date();
-                futureDate.setFullYear(futureDate.getFullYear() + 100);
 
                 const { data, error } = await supabaseClient
                     .from('one_time_links')
@@ -110,8 +106,7 @@
                         link_token: token,
                         reading_type: readingType,
                         is_used: false,
-                        is_master: false,
-                        expires_at: futureDate.toISOString() // KESİN ÇÖZÜM: Zorunlu olan bu alanı ekliyoruz.
+                        is_master: true // *** SİZİN TESPİTİNİZE GÖRE DÜZELTİLDİ ***
                     })
                     .select()
                     .single();
