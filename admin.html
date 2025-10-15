@@ -100,13 +100,18 @@
             try {
                 const token = generateToken();
                 
+                // Gelecekte bir tarih oluştur (100 yıl sonrası)
+                const futureDate = new Date();
+                futureDate.setFullYear(futureDate.getFullYear() + 100);
+
                 const { data, error } = await supabaseClient
                     .from('one_time_links')
                     .insert({
                         link_token: token,
                         reading_type: readingType,
                         is_used: false,
-                        is_master: false // *** KESİN ÇÖZÜM: Bu satır eklendi ***
+                        is_master: false,
+                        expires_at: futureDate.toISOString() // KESİN ÇÖZÜM: Zorunlu olan bu alanı ekliyoruz.
                     })
                     .select()
                     .single();
@@ -122,6 +127,7 @@
             }
         }
         
+        // Diğer yardımcı fonksiyonlar...
         function showSuccess(token, readingType) {
             const resultDiv = document.getElementById('result');
             resultDiv.style.background = 'rgba(16, 185, 129, 0.1)';
