@@ -65,6 +65,14 @@
             </select>
         </div>
 
+        <div class="form-group">
+            <label for="userType">Kullanıcı Tipi:</label>
+            <select id="userType">
+                <option value="normal">👤 Normal (Sonuç kullanıcıya gösterilir)</option>
+                <option value="consultation">👨‍💼 Danışmanlık (Kullanıcı kaydedilir, sonuç sadece admin'e)</option>
+            </select>
+        </div>
+
         <button onclick="generateReference()" id="generateBtn">
             🎯 Referans Numarası Oluştur
         </button>
@@ -99,6 +107,7 @@
         async function generateReference() {
             const readingType = document.getElementById('readingType').value;
             const codeType = document.getElementById('codeType').value;
+            const userType = document.getElementById('userType').value;
             if (!readingType) { showError('Lütfen bir fal türü seçin!'); return; }
             if (!initSupabase()) return;
 
@@ -120,6 +129,7 @@
                         reading_type: readingType,
                         is_used: false,
                         is_master: isMaster,
+                        user_type: userType,
                         expires_at: futureDate.toISOString()
                     })
                     .select()
@@ -127,7 +137,7 @@
 
                 if (error) throw error;
 
-                showSuccess(token, readingType, isMaster);
+                showSuccess(token, readingType, isMaster, userType);
             } catch (error) {
                 showError('Referans numarası oluşturulamadı: ' + error.message);
             } finally {
@@ -137,13 +147,14 @@
         }
         
         // Diğer yardımcı fonksiyonlar...
-        function showSuccess(token, readingType, isMaster) {
+        function showSuccess(token, readingType, isMaster, userType) {
             const resultDiv = document.getElementById('result');
             resultDiv.style.background = 'rgba(16, 185, 129, 0.1)';
             resultDiv.style.borderColor = '#10b981';
             document.getElementById('resultTitle').textContent = '✅ Başarıyla Oluşturuldu! (Kopyalamak için koda tıklayın)';
-            const codeTypeText = isMaster ? '♾️ Sınırsız Kullanım' : '🎫 Tek Kullanımlık';
-            document.getElementById('resultMessage').textContent = `Fal Türü: ${getReadingTypeName(readingType)} | Tip: ${codeTypeText}`;
+            const codeTypeText = isMaster ? '♾️ Sınırsız' : '🎫 Tek Kullanım';
+            const userTypeText = userType === 'consultation' ? '👨‍💼 Danışmanlık' : '👤 Normal';
+            document.getElementById('resultMessage').textContent = `Fal: ${getReadingTypeName(readingType)} | ${codeTypeText} | ${userTypeText}`;
             document.getElementById('resultCode').textContent = token;
             resultDiv.style.display = 'block';
         }

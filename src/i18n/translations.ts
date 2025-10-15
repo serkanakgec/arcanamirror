@@ -19,7 +19,7 @@ export const languages: { code: Language; name: string; flag: string }[] = [
 
 export const translations = {
   en: {
-    appName: 'Arcana Mirror',
+    appName: 'Sylvica',
     appTagline: 'Peer into the cosmic mirror and discover the wisdom of the Tarot',
     classicSpreads: 'Classic Spreads',
     thematicReadings: 'Thematic Readings',
@@ -49,7 +49,21 @@ export const translations = {
     downloadReading: 'Download Reading',
     preparing: 'Preparing...',
     linkInvalid: 'This link is invalid or has already been used.',
-    pleaseEnterQuestion: 'Please enter a question to guide your reading.'
+    pleaseEnterQuestion: 'Please enter a question to guide your reading.',
+    consultationUserInfo: 'Please provide your information for consultation',
+    firstName: 'First Name',
+    lastName: 'Last Name',
+    email: 'Email Address',
+    birthDate: 'Birth Date',
+    firstNamePlaceholder: 'Enter your first name',
+    lastNamePlaceholder: 'Enter your last name',
+    emailPlaceholder: 'your.email@example.com',
+    firstNameRequired: 'First name is required',
+    lastNameRequired: 'Last name is required',
+    emailRequired: 'Email is required',
+    emailInvalid: 'Please enter a valid email address',
+    birthDateRequired: 'Birth date is required',
+    continue: 'Continue'
   },
   de: {
     appName: 'Arcana Mirror',

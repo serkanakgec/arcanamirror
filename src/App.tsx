@@ -4,13 +4,14 @@ import { ReadingTypePage } from './pages/ReadingTypePage';
 import { QuestionPage } from './pages/QuestionPage';
 import { CardSelectionPage } from './pages/CardSelectionPage';
 import { ReadingResultPage } from './pages/ReadingResultPage';
+import { UserInfoPage, UserInfo } from './pages/UserInfoPage';
 import { generateDetailedReading } from './services/geminiService';
-import { markLinkAsUsed } from './services/linkService';
+import { markLinkAsUsed, createConsultationUser, saveConsultation } from './services/linkService';
 import { tarotDeck } from './data/tarotDeck';
 import { Language } from './i18n/translations';
-import { ShieldAlert } from 'lucide-react';
+import { ShieldAlert, CheckCircle } from 'lucide-react';
 
-type AppState = 'type-selection' | 'question' | 'card-selection' | 'result' | 'invalid-link';
+type AppState = 'type-selection' | 'user-info' | 'question' | 'card-selection' | 'result' | 'consultation-success' | 'invalid-link';
 
 function App() {
   const [appState, setAppState] = useState<AppState>('type-selection');
@@ -20,7 +21,10 @@ function App() {
   const [reading, setReading] = useState('');
   const [error, setError] = useState('');
   const [language, setLanguage] = useState<Language>('en');
-  const [linkId, setLinkId] = useState<string | null>(null); // Bu state'in varlığını kontrol edin
+  const [linkId, setLinkId] = useState<string | null>(null);
+  const [userType, setUserType] = useState<'normal' | 'consultation'>('normal');
+  const [referenceCode, setReferenceCode] = useState<string | null>(null);
+  const [consultationUserId, setConsultationUserId] = useState<string | null>(null);
 
   useEffect(() => {
     // ... useEffect içindeki kod doğru ve değişmesine gerek yok ...
@@ -31,10 +35,33 @@ function App() {
     localStorage.setItem('language', lang);
   };
 
-  const handleSelectType = (type: ReadingType, validatedLinkId: string) => {
+  const handleSelectType = (type: ReadingType, validatedLinkId: string, linkUserType?: 'normal' | 'consultation', linkReferenceCode?: string) => {
     setReadingType(type);
-    setLinkId(validatedLinkId); // linkId'yi state'e kaydediyoruz
-    setAppState('question');
+    setLinkId(validatedLinkId);
+    setUserType(linkUserType || 'normal');
+    setReferenceCode(linkReferenceCode || null);
+
+    if (linkUserType === 'consultation') {
+      setAppState('user-info');
+    } else {
+      setAppState('question');
+    }
+  };
+
+  const handleUserInfoSubmit = async (userInfo: UserInfo) => {
+    if (!referenceCode) return;
+
+    const result = await createConsultationUser({
+      ...userInfo,
+      referenceCode
+    });
+
+    if (result.success && result.userId) {
+      setConsultationUserId(result.userId);
+      setAppState('question');
+    } else {
+      setError(result.error || 'Failed to create user');
+    }
   };
 
   const handleQuestionSubmit = (q: string) => {
@@ -44,7 +71,6 @@ function App() {
 
   const handleCardsSelected = async (cards: SelectedCard[]) => {
     setSelectedCards(cards);
-    setAppState('result');
     setReading('');
     setError('');
 
@@ -62,8 +88,30 @@ function App() {
 
     if (result.error) {
       setError(result.error);
+      setAppState('result');
+      return;
+    }
+
+    setReading(result.reading);
+
+    if (userType === 'consultation' && consultationUserId && referenceCode) {
+      const saved = await saveConsultation({
+        userId: consultationUserId,
+        referenceCode,
+        readingType,
+        question,
+        selectedCards: cards,
+        readingResult: result.reading
+      });
+
+      if (saved) {
+        setAppState('consultation-success');
+      } else {
+        setError('Failed to save consultation');
+        setAppState('result');
+      }
     } else {
-      setReading(result.reading);
+      setAppState('result');
     }
   };
 
@@ -81,6 +129,23 @@ function App() {
     );
   }
 
+  if (appState === 'consultation-success') {
+    return (
+      <div className="min-h-screen starfield flex items-center justify-center text-center">
+        <div className="bg-slate-900/80 backdrop-blur-sm border-2 border-green-500/30 rounded-lg p-8 max-w-md mx-4">
+          <CheckCircle className="text-green-400 w-16 h-16 mx-auto mb-4" />
+          <h1 className="text-3xl font-decorative text-green-400 mb-2">Consultation Submitted</h1>
+          <p className="text-slate-300 mb-4">
+            Your reading has been submitted successfully. Our team will review it and contact you via email.
+          </p>
+          <p className="text-slate-400 text-sm">
+            Thank you for using Sylvica.
+          </p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <>
       {appState === 'type-selection' && (
@@ -91,7 +156,12 @@ function App() {
         />
       )}
 
-      {/* --- BURADAN İTİBAREN DÜZELTİLDİ --- */}
+      {appState === 'user-info' && (
+        <UserInfoPage
+          onSubmit={handleUserInfoSubmit}
+          language={language}
+        />
+      )}
 
       {appState === 'question' && readingType && (
         <QuestionPage

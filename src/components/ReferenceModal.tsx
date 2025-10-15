@@ -7,7 +7,7 @@ import { Language, getTranslation } from '../i18n/translations';
 interface ReferenceModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onSuccess: (linkId: string) => void;
+  onSuccess: (linkId: string, userType?: 'normal' | 'consultation', referenceCode?: string) => void;
   selectedReadingType: ReadingType;
   language: Language;
 }
@@ -202,7 +202,7 @@ export function ReferenceModal({
       setIsValidating(false);
       setReferenceNumber('');
       setError('');
-      onSuccess(result.linkId);
+      onSuccess(result.linkId, result.userType, result.referenceCode);
     } catch (err) {
       setError(errorMessages.invalidReference[language]);
       setIsValidating(false);
